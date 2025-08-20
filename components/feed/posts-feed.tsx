@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { useEffect, useRef, useState, useMemo, memo } from "react"
-import { usePosts } from "@/hooks/use-posts"
-import { PostCard } from "./post-card"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Camera, RefreshCw } from "lucide-react"
-import { ImageUploadDialog } from "@/components/upload/image-upload-dialog"
+import { useEffect, useRef, useState, useMemo, memo } from 'react'
+import { usePosts } from '@/hooks/use-posts'
+import { PostCard } from './post-card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Camera, RefreshCw } from 'lucide-react'
+import { ImageUploadDialog } from '@/components/upload/image-upload-dialog'
 
 interface PostsFeedProps {
   onUploadSuccess?: () => void
@@ -21,43 +21,40 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
 
   // Memoize posts individually
   useEffect(() => {
-    console.log("PostsFeed: checking posts for memoization");
-    const newRenderedPosts: JSX.Element[] = [];
-    
+    console.log('PostsFeed: checking posts for memoization')
+    const newRenderedPosts: JSX.Element[] = []
+
     posts.forEach((post, index) => {
-      const prevPost = previousPostsRef.current.find(p => p.id === post.id);
-      const priority = index < 2;
-      
+      const prevPost = previousPostsRef.current.find((p) => p.id === post.id)
+      const priority = index < 2
+
       // Check if the post has changed
-      const hasChanged = !prevPost || 
+      const hasChanged =
+        !prevPost ||
         prevPost.likes_count !== post.likes_count ||
         prevPost.user_has_liked !== post.user_has_liked ||
         prevPost.comments?.length !== post.comments?.length ||
-        prevPost.comments !== post.comments; // also react to new array reference for comments
-      
+        prevPost.comments !== post.comments // also react to new array reference for comments
+
       if (hasChanged) {
-        console.log("Post changed, re-rendering:", post.id);
-        newRenderedPosts.push(
-          <PostCard key={post.id} post={post} priority={priority} />
-        );
+        console.log('Post changed, re-rendering:', post.id)
+        newRenderedPosts.push(<PostCard key={post.id} post={post} priority={priority} />)
       } else {
         // Find the old render for this post
-        const oldRender = renderedPosts.find(rendered => rendered.key === post.id);
+        const oldRender = renderedPosts.find((rendered) => rendered.key === post.id)
         if (oldRender) {
-          console.log("Post unchanged, reusing render:", post.id);
-          newRenderedPosts.push(oldRender);
+          console.log('Post unchanged, reusing render:', post.id)
+          newRenderedPosts.push(oldRender)
         } else {
-          console.log("Post unchanged but no old render, creating new:", post.id);
-          newRenderedPosts.push(
-            <PostCard key={post.id} post={post} priority={priority} />
-          );
+          console.log('Post unchanged but no old render, creating new:', post.id)
+          newRenderedPosts.push(<PostCard key={post.id} post={post} priority={priority} />)
         }
       }
-    });
-    
-    setRenderedPosts(newRenderedPosts);
-    previousPostsRef.current = [...posts];
-      }, [posts]); // Removed renderedPosts from dependencies
+    })
+
+    setRenderedPosts(newRenderedPosts)
+    previousPostsRef.current = [...posts]
+  }, [posts]) // Removed renderedPosts from dependencies
 
   const handleUploadSuccess = () => {
     refreshPosts()
@@ -75,7 +72,7 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
           observer.disconnect()
         }
       },
-      { rootMargin: "200px" }
+      { rootMargin: '200px' }
     )
     observer.observe(sentinelRef.current)
     return () => observer.disconnect()
@@ -159,7 +156,7 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
       {hasMore && (
         <div className="flex justify-center pt-2">
           <Button onClick={fetchNextPage} variant="outline" disabled={isLoadingMore} aria-label="Load more posts">
-            {isLoadingMore ? "Loading..." : "Load more"}
+            {isLoadingMore ? 'Loading...' : 'Load more'}
           </Button>
         </div>
       )}

@@ -5,6 +5,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 ## Project Architecture & Tech Stack
 
 **Core Technologies:**
+
 - Next.js 15 with App Router (app directory)
 - TypeScript strict mode
 - Tailwind CSS for styling
@@ -15,6 +16,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 - Lucide React for icons
 
 **Code Generation Rules:**
+
 - Always include proper TypeScript types and interfaces
 - Error handling with try/catch blocks
 - Loading states and skeleton components
@@ -27,6 +29,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 ## Pages & Routing Structure
 
 **App Router Pages:**
+
 - `/` - Home feed with photo grid
 - `/auth/signin` - User sign in page
 - `/auth/signup` - User registration page
@@ -37,6 +40,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 ## Layout & Navigation
 
 **Header Navigation:**
+
 - Left: "PicShare" logo with camera icon (Lucide React)
 - Center: Navigation links
   - "Home" (always visible)
@@ -48,6 +52,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 - Mobile: Hamburger menu for small screens
 
 **Responsive Design:**
+
 - Desktop: 3-column photo grid
 - Mobile: 1-column photo grid
 - Use next/image for all images with responsive sizes
@@ -56,6 +61,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 ## Core Functionality Requirements
 
 ### 1. User Authentication (Supabase Auth)
+
 - Registration with email/password
 - Login with email/password
 - Automatic profile creation on signup
@@ -63,6 +69,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 - Session management with AuthProvider context
 
 ### 2. Image Upload System
+
 - File upload with drag & drop support
 - Image preview before upload
 - File type validation (jpg, png, webp, gif)
@@ -72,6 +79,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 - Organized storage: `/user_id/filename.ext`
 
 ### 3. Photo Gallery & Feed
+
 - Main feed displaying all posts in chronological order
 - Photo grid layout with responsive columns
 - Infinite scroll or pagination
@@ -80,6 +88,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 - Real-time updates when new posts are added
 
 ### 4. User Interactions
+
 - Like/unlike posts with heart icon
 - Real-time like count updates
 - Add/delete comments on posts
@@ -89,6 +98,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 ## Database Integration (Supabase)
 
 **Environment Variables:**
+
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://vbmjwyzimcezocxxbqxm.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZibWp3eXppbWNlem9jeHhicXhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2MTI3NjgsImV4cCI6MjA3MTE4ODc2OH0.LjmXtJU6gN033_uTzSlXinZMNN7VbnOUu0MDtd5ADcQ
@@ -99,42 +109,43 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzd
 ```typescript
 // TypeScript Interfaces
 interface Profile {
-  id: string;
-  username: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  created_at: string;
+  id: string
+  username: string
+  full_name: string | null
+  avatar_url: string | null
+  created_at: string
 }
 
 interface Post {
-  id: string;
-  user_id: string;
-  title: string;
-  description: string | null;
-  image_url: string;
-  created_at: string;
-  likes_count: number;
-  profiles?: Profile; // Join relation
+  id: string
+  user_id: string
+  title: string
+  description: string | null
+  image_url: string
+  created_at: string
+  likes_count: number
+  profiles?: Profile // Join relation
 }
 
 interface Like {
-  id: string;
-  user_id: string;
-  post_id: string;
-  created_at: string;
+  id: string
+  user_id: string
+  post_id: string
+  created_at: string
 }
 
 interface Comment {
-  id: string;
-  user_id: string;
-  post_id: string;
-  content: string;
-  created_at: string;
-  profiles?: Profile; // Join relation
+  id: string
+  user_id: string
+  post_id: string
+  content: string
+  created_at: string
+  profiles?: Profile // Join relation
 }
 ```
 
 **Storage Configuration:**
+
 - Bucket name: "images"
 - Public bucket for image access
 - File organization: `/user_id/filename.ext`
@@ -142,6 +153,7 @@ interface Comment {
 ## Required Components & Structure
 
 ### Core Components:
+
 ```
 components/
 ├── ui/              # shadcn/ui components
@@ -166,20 +178,36 @@ components/
 ```
 
 ### Required Hooks:
+
 ```typescript
 // Custom hooks for data fetching
-const useAuth = () => { /* Supabase auth state */ }
-const usePosts = () => { /* Fetch all posts with React Query */ }
-const useUserPosts = (userId: string) => { /* User-specific posts */ }
-const usePost = (postId: string) => { /* Single post with comments */ }
-const useUploadImage = () => { /* Image upload to storage */ }
-const useLikePost = () => { /* Like/unlike mutation */ }
-const useComments = (postId: string) => { /* Post comments */ }
+const useAuth = () => {
+  /* Supabase auth state */
+}
+const usePosts = () => {
+  /* Fetch all posts with React Query */
+}
+const useUserPosts = (userId: string) => {
+  /* User-specific posts */
+}
+const usePost = (postId: string) => {
+  /* Single post with comments */
+}
+const useUploadImage = () => {
+  /* Image upload to storage */
+}
+const useLikePost = () => {
+  /* Like/unlike mutation */
+}
+const useComments = (postId: string) => {
+  /* Post comments */
+}
 ```
 
 ## Implementation Details
 
 ### Supabase Client Setup:
+
 ```typescript
 // lib/supabaseClient.ts
 import { createClient } from '@supabase/supabase-js'
@@ -191,12 +219,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ```
 
 ### Form Validation:
+
 - Use React Hook Form with Zod schemas
 - Validate file types and sizes
 - Show inline error messages
 - Loading states during submissions
 
 ### Performance Optimizations:
+
 - Use next/image with proper sizing
 - Implement image lazy loading
 - Add blur placeholders for images
@@ -204,6 +234,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 - Use React Query for caching and real-time updates
 
 ### Real-time Features:
+
 - Subscribe to new posts in feed
 - Real-time like count updates
 - Live comment updates on posts (insert/update/delete)
@@ -212,6 +243,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ## Design System & UI
 
 **Visual Style:**
+
 - Instagram-inspired clean aesthetic
 - Card-based layouts with subtle shadows
 - Glassmorphism effects for modern feel
@@ -219,12 +251,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 - Smooth animations and transitions
 
 **Color Scheme:**
+
 - Support both light and dark themes
 - Use CSS custom properties for theme switching
 - Accessible color contrast ratios
 - Brand colors for primary actions
 
 **Loading States:**
+
 - Skeleton components for feed loading
 - Spinner for form submissions
 - Progressive image loading with blur
@@ -233,18 +267,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ## Error Handling & Validation
 
 **Frontend Validation:**
+
 - Form validation with Zod schemas
 - File type/size validation before upload
 - Real-time validation feedback
 - Accessible error messages
 
 **Error Boundaries:**
+
 - Wrap all routes in error boundaries
 - Graceful error fallbacks
 - Error reporting for debugging
 - Retry mechanisms for failed operations
 
 **Network Error Handling:**
+
 - Handle Supabase connection errors
 - Offline state detection
 - Retry logic for failed requests
@@ -253,12 +290,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ## Security & Best Practices
 
 **Authentication Security:**
+
 - Row Level Security (RLS) enabled on all tables
 - Protected routes with proper redirects
 - Secure file upload validation
 - User session management
 
 **Data Protection:**
+
 - Input sanitization for user content
 - Proper CORS configuration
 - Environment variable security
@@ -267,6 +306,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 ## Deployment Requirements
 
 **Production Checklist:**
+
 - All environment variables configured
 - Supabase RLS policies active
 - Image optimization enabled

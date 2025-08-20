@@ -1,27 +1,34 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState, useRef } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Camera, Loader2 } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
-import { useAvatarUpload } from "@/hooks/use-avatar-upload"
+import { useState, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Camera, Loader2 } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+import { useAvatarUpload } from '@/hooks/use-avatar-upload'
 
 const profileSchema = z.object({
   username: z
     .string()
-    .min(3, "Username must be at least 3 characters")
-    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
-  full_name: z.string().max(100, "Full name must be less than 100 characters").optional(),
+    .min(3, 'Username must be at least 3 characters')
+    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+  full_name: z.string().max(100, 'Full name must be less than 100 characters').optional(),
   // Bio removed
 })
 
@@ -42,9 +49,8 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
   const form = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      username: profile?.username || "",
-      full_name: profile?.full_name || "",
-      
+      username: profile?.username || '',
+      full_name: profile?.full_name || '',
     },
   })
 
@@ -68,7 +74,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
     })
 
     if (error) {
-      form.setError("root", { message: error.message || "Failed to update profile" })
+      form.setError('root', { message: error.message || 'Failed to update profile' })
     } else {
       setOpen(false)
       onSuccess?.()
@@ -83,8 +89,8 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
       if (newOpen) {
         // Reset form with current profile data
         form.reset({
-          username: profile?.username || "",
-          full_name: profile?.full_name || "",
+          username: profile?.username || '',
+          full_name: profile?.full_name || '',
         })
       }
     }
@@ -104,7 +110,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
           <div className="flex flex-col items-center space-y-4">
             <div className="relative">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={profile?.avatar_url || ""} />
+                <AvatarImage src={profile?.avatar_url || ''} />
                 <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-2xl">
                   {profile?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
                 </AvatarFallback>
@@ -120,7 +126,13 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
               </Button>
             </div>
             <p className="text-sm text-gray-600 text-center">Click the camera icon to change your profile picture</p>
-            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleAvatarChange} className="hidden" />
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              onChange={handleAvatarChange}
+              className="hidden"
+            />
           </div>
 
           {/* Form Fields */}
@@ -130,7 +142,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
               <Input
                 id="username"
                 placeholder="Enter your username"
-                {...form.register("username")}
+                {...form.register('username')}
                 className="bg-white/50 dark:bg-gray-700/50 dark:text-white dark:border-gray-600"
               />
               {form.formState.errors.username && (
@@ -143,7 +155,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
               <Input
                 id="full_name"
                 placeholder="Enter your full name"
-                {...form.register("full_name")}
+                {...form.register('full_name')}
                 className="bg-white/50 dark:bg-gray-700/50 dark:text-white dark:border-gray-600"
               />
               {form.formState.errors.full_name && (
@@ -167,7 +179,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
               type="button"
               variant="destructive"
               onClick={async () => {
-                if (confirm("This will delete your account and all your posts. Are you sure?")) {
+                if (confirm('This will delete your account and all your posts. Are you sure?')) {
                   await deleteAccount()
                   setOpen(false)
                 }
@@ -191,7 +203,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
               disabled={isLoading || isUploading}
             >
               {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isLoading ? "Saving..." : "Save Changes"}
+              {isLoading ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </form>

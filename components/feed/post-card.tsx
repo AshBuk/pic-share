@@ -1,20 +1,20 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState, memo, useEffect } from "react"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { MoreHorizontal, Trash2 } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
-import { usePostActions } from "@/hooks/use-post-actions"
-import type { PostWithProfile } from "@/lib/supabase/types"
-import Image from "next/image"
-import Link from "next/link"
-import { formatDistanceToNow } from "date-fns"
-import { PostActions } from "@/components/shared/post-actions"
+import { useState, memo, useEffect } from 'react'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { MoreHorizontal, Trash2 } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+import { usePostActions } from '@/hooks/use-post-actions'
+import type { PostWithProfile } from '@/lib/supabase/types'
+import Image from 'next/image'
+import Link from 'next/link'
+import { formatDistanceToNow } from 'date-fns'
+import { PostActions } from '@/components/shared/post-actions'
 
 interface PostCardProps {
   post: PostWithProfile
@@ -22,58 +22,55 @@ interface PostCardProps {
 }
 
 // Memoized image component - SHOULD NOT re-render when likes change
-const PostImage = memo(({ imageUrl, title, postId, priority }: { 
-  imageUrl: string, 
-  title: string, 
-  postId: string, 
-  priority: boolean 
-}) => {
-  console.log("PostImage render for:", postId);
-  return (
-    <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
-      {imageUrl ? (
-        <Link href={`/post/${postId}`} aria-label="Open post">
-          <Image
-            src={imageUrl}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            placeholder="blur"
-            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxMCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNSIgY3k9IjUiIHI9IjUiIGZpbGw9IiNlMGUwZTAiLz4KPC9zdmc+"
-            onError={(e) => {
-              const target = e.currentTarget;
-              target.src = "/placeholder.jpg";
-              target.srcset = "";
-            }}
-            priority={priority}
-            loading={priority ? "eager" : "lazy"}
-            unoptimized={false}
-          />
-        </Link>
-      ) : (
-        <div className="w-full h-full flex items-center justify-center">
-          <span className="text-gray-400 text-sm">No image</span>
-        </div>
-      )}
-    </div>
-  );
-}, (prevProps, nextProps) => {
-  // Image should NOT re-render when likes change
-  return (
-    prevProps.imageUrl === nextProps.imageUrl &&
-    prevProps.title === nextProps.title &&
-    prevProps.postId === nextProps.postId &&
-    prevProps.priority === nextProps.priority
-  );
-});
+const PostImage = memo(
+  ({ imageUrl, title, postId, priority }: { imageUrl: string; title: string; postId: string; priority: boolean }) => {
+    console.log('PostImage render for:', postId)
+    return (
+      <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+        {imageUrl ? (
+          <Link href={`/post/${postId}`} aria-label="Open post">
+            <Image
+              src={imageUrl}
+              alt={title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              placeholder="blur"
+              blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxMCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNSIgY3k9IjUiIHI9IjUiIGZpbGw9IiNlMGUwZTAiLz4KPC9zdmc+"
+              onError={(e) => {
+                const target = e.currentTarget
+                target.src = '/placeholder.jpg'
+                target.srcset = ''
+              }}
+              priority={priority}
+              loading={priority ? 'eager' : 'lazy'}
+              unoptimized={false}
+            />
+          </Link>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center">
+            <span className="text-gray-400 text-sm">No image</span>
+          </div>
+        )}
+      </div>
+    )
+  },
+  (prevProps, nextProps) => {
+    // Image should NOT re-render when likes change
+    return (
+      prevProps.imageUrl === nextProps.imageUrl &&
+      prevProps.title === nextProps.title &&
+      prevProps.postId === nextProps.postId &&
+      prevProps.priority === nextProps.priority
+    )
+  }
+)
 
-PostImage.displayName = "PostImage";
-
+PostImage.displayName = 'PostImage'
 
 function PostCardComponent({ post, priority = false }: PostCardProps) {
-  console.log("PostCard render for post:", post.id, "likes:", post.likes_count, "user_has_liked:", post.user_has_liked);
-  
+  console.log('PostCard render for post:', post.id, 'likes:', post.likes_count, 'user_has_liked:', post.user_has_liked)
+
   const { user } = useAuth()
   const { deletePost } = usePostActions()
   const [currentPost, setCurrentPost] = useState(post)
@@ -92,7 +89,7 @@ function PostCardComponent({ post, priority = false }: PostCardProps) {
   }, [post, currentPost])
 
   const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this post?")) {
+    if (confirm('Are you sure you want to delete this post?')) {
       deletePost(post.id)
     }
   }
@@ -109,9 +106,9 @@ function PostCardComponent({ post, priority = false }: PostCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <Avatar>
-              <AvatarImage src={post.profiles?.avatar_url || ""} />
+              <AvatarImage src={post.profiles?.avatar_url || ''} />
               <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                {post.profiles?.username?.[0]?.toUpperCase() || "U"}
+                {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
               </AvatarFallback>
             </Avatar>
             <div>
@@ -142,12 +139,7 @@ function PostCardComponent({ post, priority = false }: PostCardProps) {
 
       <CardContent className="space-y-4">
         {/* Image */}
-        <PostImage 
-          imageUrl={post.image_url}
-          title={post.title}
-          postId={post.id}
-          priority={priority}
-        />
+        <PostImage imageUrl={post.image_url} title={post.title} postId={post.id} priority={priority} />
 
         {/* Content */}
         <div>
@@ -156,12 +148,7 @@ function PostCardComponent({ post, priority = false }: PostCardProps) {
         </div>
 
         {/* Unified Post Actions */}
-        <PostActions 
-          post={currentPost} 
-          showComments={false}
-          onPostUpdate={handlePostUpdate}
-        />
-
+        <PostActions post={currentPost} showComments={false} onPostUpdate={handlePostUpdate} />
       </CardContent>
     </Card>
   )
@@ -170,25 +157,25 @@ function PostCardComponent({ post, priority = false }: PostCardProps) {
 // Memoize PostCard, updates only when key data changes
 export const PostCard = memo(PostCardComponent, (prevProps, nextProps) => {
   // Check each field separately for debugging
-  const idSame = prevProps.post.id === nextProps.post.id;
-  const likesSame = prevProps.post.likes_count === nextProps.post.likes_count;
-  const userLikedSame = prevProps.post.user_has_liked === nextProps.post.user_has_liked;
-  const commentsSame = prevProps.post.comments?.length === nextProps.post.comments?.length;
-  const prioritySame = prevProps.priority === nextProps.priority;
-  
-  const shouldSkipUpdate = idSame && likesSame && userLikedSame && commentsSame && prioritySame;
-  
+  const idSame = prevProps.post.id === nextProps.post.id
+  const likesSame = prevProps.post.likes_count === nextProps.post.likes_count
+  const userLikedSame = prevProps.post.user_has_liked === nextProps.post.user_has_liked
+  const commentsSame = prevProps.post.comments?.length === nextProps.post.comments?.length
+  const prioritySame = prevProps.priority === nextProps.priority
+
+  const shouldSkipUpdate = idSame && likesSame && userLikedSame && commentsSame && prioritySame
+
   if (!shouldSkipUpdate) {
-    console.log("PostCard WILL re-render for post:", nextProps.post.id, {
+    console.log('PostCard WILL re-render for post:', nextProps.post.id, {
       idSame,
       likesSame: `${prevProps.post.likes_count} -> ${nextProps.post.likes_count} (${likesSame})`,
       userLikedSame: `${prevProps.post.user_has_liked} -> ${nextProps.post.user_has_liked} (${userLikedSame})`,
       commentsSame: `${prevProps.post.comments?.length} -> ${nextProps.post.comments?.length} (${commentsSame})`,
-      prioritySame
-    });
+      prioritySame,
+    })
   } else {
-    console.log("PostCard SKIP re-render for post:", nextProps.post.id);
+    console.log('PostCard SKIP re-render for post:', nextProps.post.id)
   }
-  
-  return shouldSkipUpdate;
-});
+
+  return shouldSkipUpdate
+})

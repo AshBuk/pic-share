@@ -1,15 +1,15 @@
-"use client"
+'use client'
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Camera, Settings, Grid3X3, Heart } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
-import { useUserPosts } from "@/hooks/use-user-posts"
-import { EditProfileDialog } from "./edit-profile-dialog"
-import { PostCard } from "@/components/feed/post-card"
-import { formatDistanceToNow } from "date-fns"
+import { Card, CardContent } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Camera, Settings, Grid3X3, Heart } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+import { useUserPosts } from '@/hooks/use-user-posts'
+import { EditProfileDialog } from './edit-profile-dialog'
+import { PostCard } from '@/components/feed/post-card'
+import { formatDistanceToNow } from 'date-fns'
 
 interface UserProfileProps {
   userId?: string
@@ -42,7 +42,7 @@ export function UserProfile({ userId }: UserProfileProps) {
           <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
             {/* Avatar */}
             <Avatar className="h-32 w-32">
-              <AvatarImage src={currentProfile.avatar_url || ""} />
+              <AvatarImage src={currentProfile.avatar_url || ''} />
               <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-4xl">
                 {currentProfile.username?.[0]?.toUpperCase()}
               </AvatarFallback>
@@ -128,7 +128,7 @@ export function UserProfile({ userId }: UserProfileProps) {
                   <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No posts yet</p>
                   <p className="text-gray-600 dark:text-gray-300">
                     {isOwnProfile
-                      ? "Share your first photo to get started!"
+                      ? 'Share your first photo to get started!'
                       : "This user hasn't shared any photos yet."}
                   </p>
                 </div>
