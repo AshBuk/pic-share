@@ -10,7 +10,6 @@ export interface Database {
           full_name: string | null
           avatar_url: string | null
           created_at: string
-          role: "user" | "admin" | "moderator"
         }
         Insert: {
           id: string
@@ -18,7 +17,6 @@ export interface Database {
           full_name?: string | null
           avatar_url?: string | null
           created_at?: string
-          role?: "user" | "admin" | "moderator"
         }
         Update: {
           id?: string
@@ -26,7 +24,6 @@ export interface Database {
           full_name?: string | null
           avatar_url?: string | null
           created_at?: string
-          role?: "user" | "admin" | "moderator"
         }
       }
       posts: {

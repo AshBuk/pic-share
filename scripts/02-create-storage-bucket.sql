@@ -1,6 +1,7 @@
 -- Create storage bucket for images
 INSERT INTO storage.buckets (id, name, public) 
-VALUES ('images', 'images', true);
+VALUES ('images', 'images', true)
+ON CONFLICT (id) DO NOTHING;
 
 -- Create policy for storage bucket
 CREATE POLICY "Images are publicly accessible" ON storage.objects

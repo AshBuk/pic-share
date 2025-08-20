@@ -17,7 +17,7 @@ interface UserProfileProps {
 
 export function UserProfile({ userId }: UserProfileProps) {
   const { user, profile } = useAuth()
-  const { posts, loading, error } = useUserPosts(userId || user?.id)
+  const { posts, loading, error, likedPosts, loadingLiked, errorLiked } = useUserPosts(userId || user?.id)
   const isOwnProfile = !userId || userId === user?.id
 
   const currentProfile = profile // In a full app, you'd fetch the specific user's profile
@@ -25,9 +25,9 @@ export function UserProfile({ userId }: UserProfileProps) {
   if (!currentProfile) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+        <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
           <CardContent className="p-8 text-center">
-            <p className="text-gray-600">Profile not found</p>
+            <p className="text-gray-600 dark:text-gray-300">Profile not found</p>
           </CardContent>
         </Card>
       </div>
@@ -37,7 +37,7 @@ export function UserProfile({ userId }: UserProfileProps) {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
       {/* Profile Header */}
-      <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+      <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
         <CardContent className="p-8">
           <div className="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8">
             {/* Avatar */}
@@ -52,8 +52,8 @@ export function UserProfile({ userId }: UserProfileProps) {
             <div className="flex-1 text-center md:text-left space-y-4">
               <div>
                 <h1 className="text-2xl font-bold">{currentProfile.full_name || currentProfile.username}</h1>
-                <p className="text-gray-600">@{currentProfile.username}</p>
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-gray-600 dark:text-gray-300">@{currentProfile.username}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
                   Joined {formatDistanceToNow(new Date(currentProfile.created_at), { addSuffix: true })}
                 </p>
               </div>
@@ -62,7 +62,7 @@ export function UserProfile({ userId }: UserProfileProps) {
               <div className="flex justify-center md:justify-start space-x-8">
                 <div className="text-center">
                   <p className="text-2xl font-bold">{posts.length}</p>
-                  <p className="text-sm text-gray-600">Posts</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Posts</p>
                 </div>
                 <div className="text-center">
                   <p className="text-2xl font-bold">0</p>
@@ -111,22 +111,22 @@ export function UserProfile({ userId }: UserProfileProps) {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {[...Array(6)].map((_, i) => (
-                <div key={i} className="aspect-square bg-gray-200 rounded-lg animate-pulse" />
+                <div key={i} className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
               ))}
             </div>
           ) : error ? (
-            <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+            <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
               <CardContent className="p-8 text-center">
-                <p className="text-red-600">Failed to load posts: {error}</p>
+                <p className="text-red-600 dark:text-red-400">Failed to load posts: {error}</p>
               </CardContent>
             </Card>
           ) : posts.length === 0 ? (
-            <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+            <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
               <CardContent className="p-8 text-center space-y-4">
-                <Camera className="h-16 w-16 text-gray-400 mx-auto" />
+                <Camera className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto" />
                 <div>
-                  <p className="text-lg font-medium text-gray-900">No posts yet</p>
-                  <p className="text-gray-600">
+                  <p className="text-lg font-medium text-gray-900 dark:text-gray-100">No posts yet</p>
+                  <p className="text-gray-600 dark:text-gray-300">
                     {isOwnProfile
                       ? "Share your first photo to get started!"
                       : "This user hasn't shared any photos yet."}
@@ -144,12 +144,32 @@ export function UserProfile({ userId }: UserProfileProps) {
         </TabsContent>
 
         <TabsContent value="liked" className="mt-6">
-          <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
-            <CardContent className="p-8 text-center">
-              <Heart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600">Liked posts feature coming soon!</p>
-            </CardContent>
-          </Card>
+          {loadingLiked ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="aspect-square bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : errorLiked ? (
+            <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
+              <CardContent className="p-8 text-center">
+                <p className="text-red-600 dark:text-red-400">Failed to load liked posts: {errorLiked}</p>
+              </CardContent>
+            </Card>
+          ) : likedPosts.length === 0 ? (
+            <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+              <CardContent className="p-8 text-center">
+                <Heart className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600">No liked posts yet</p>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="space-y-6">
+              {likedPosts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
+            </div>
+          )}
         </TabsContent>
       </Tabs>
     </div>

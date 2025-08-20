@@ -2,42 +2,94 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, memo, useEffect } from "react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { Heart, MessageCircle, Share2, MoreHorizontal, Trash2, Send } from "lucide-react"
+import { MoreHorizontal, Trash2 } from "lucide-react"
 import { useAuth } from "@/hooks/use-auth"
 import { usePostActions } from "@/hooks/use-post-actions"
 import type { PostWithProfile } from "@/lib/supabase/types"
 import Image from "next/image"
+import Link from "next/link"
 import { formatDistanceToNow } from "date-fns"
+import { PostActions } from "@/components/shared/post-actions"
 
 interface PostCardProps {
   post: PostWithProfile
+  priority?: boolean
 }
 
-export function PostCard({ post }: PostCardProps) {
-  const [showComments, setShowComments] = useState(false)
-  const [commentText, setCommentText] = useState("")
+// Memoized image component - SHOULD NOT re-render when likes change
+const PostImage = memo(({ imageUrl, title, postId, priority }: { 
+  imageUrl: string, 
+  title: string, 
+  postId: string, 
+  priority: boolean 
+}) => {
+  console.log("PostImage render for:", postId);
+  return (
+    <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
+      {imageUrl ? (
+        <Link href={`/post/${postId}`} aria-label="Open post">
+          <Image
+            src={imageUrl}
+            alt={title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            placeholder="blur"
+            blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAiIGhlaWdodD0iMTAiIHZpZXdCb3g9IjAgMCAxMCAxMCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iNSIgY3k9IjUiIHI9IjUiIGZpbGw9IiNlMGUwZTAiLz4KPC9zdmc+"
+            onError={(e) => {
+              const target = e.currentTarget;
+              target.src = "/placeholder.jpg";
+              target.srcset = "";
+            }}
+            priority={priority}
+            loading={priority ? "eager" : "lazy"}
+            unoptimized={false}
+          />
+        </Link>
+      ) : (
+        <div className="w-full h-full flex items-center justify-center">
+          <span className="text-gray-400 text-sm">No image</span>
+        </div>
+      )}
+    </div>
+  );
+}, (prevProps, nextProps) => {
+  // Image should NOT re-render when likes change
+  return (
+    prevProps.imageUrl === nextProps.imageUrl &&
+    prevProps.title === nextProps.title &&
+    prevProps.postId === nextProps.postId &&
+    prevProps.priority === nextProps.priority
+  );
+});
+
+PostImage.displayName = "PostImage";
+
+
+function PostCardComponent({ post, priority = false }: PostCardProps) {
+  console.log("PostCard render for post:", post.id, "likes:", post.likes_count, "user_has_liked:", post.user_has_liked);
+  
   const { user } = useAuth()
-  const { toggleLike, addComment, deletePost, isLoading } = usePostActions()
+  const { deletePost } = usePostActions()
+  const [currentPost, setCurrentPost] = useState(post)
 
-  const handleLike = () => {
-    toggleLike(post.id, post.user_has_liked)
-  }
-
-  const handleComment = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!commentText.trim()) return
-
-    const { error } = await addComment(post.id, commentText)
-    if (!error) {
-      setCommentText("")
+  // Keep local state in sync if parent passes updated post (e.g., from feed updates)
+  useEffect(() => {
+    if (
+      currentPost.id !== post.id ||
+      currentPost.likes_count !== post.likes_count ||
+      currentPost.user_has_liked !== post.user_has_liked ||
+      (currentPost.comments?.length || 0) !== (post.comments?.length || 0) ||
+      currentPost.comments !== post.comments
+    ) {
+      setCurrentPost(post)
     }
-  }
+  }, [post, currentPost])
 
   const handleDelete = () => {
     if (confirm("Are you sure you want to delete this post?")) {
@@ -45,10 +97,14 @@ export function PostCard({ post }: PostCardProps) {
     }
   }
 
+  const handlePostUpdate = (updatedPost: PostWithProfile) => {
+    setCurrentPost(updatedPost)
+  }
+
   const isOwner = user?.id === post.user_id
 
   return (
-    <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+    <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
       <CardHeader>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -60,7 +116,7 @@ export function PostCard({ post }: PostCardProps) {
             </Avatar>
             <div>
               <p className="font-semibold">{post.profiles?.full_name || post.profiles?.username}</p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 @{post.profiles?.username} • {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
               </p>
             </div>
@@ -86,103 +142,53 @@ export function PostCard({ post }: PostCardProps) {
 
       <CardContent className="space-y-4">
         {/* Image */}
-        <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100">
-          <Image
-            src={post.image_url || "/placeholder.svg"}
-            alt={post.title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        </div>
+        <PostImage 
+          imageUrl={post.image_url}
+          title={post.title}
+          postId={post.id}
+          priority={priority}
+        />
 
         {/* Content */}
         <div>
           <h3 className="font-semibold mb-2">{post.title}</h3>
-          {post.description && <p className="text-gray-600 text-sm">{post.description}</p>}
+          {post.description && <p className="text-gray-600 dark:text-gray-300 text-sm">{post.description}</p>}
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center justify-between pt-2 border-t">
-          <div className="flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLike}
-              disabled={isLoading}
-              className={post.user_has_liked ? "text-red-500" : ""}
-            >
-              <Heart className={`h-4 w-4 mr-1 ${post.user_has_liked ? "fill-current" : ""}`} />
-              {post.likes_count}
-            </Button>
-            <Button variant="ghost" size="sm" onClick={() => setShowComments(!showComments)}>
-              <MessageCircle className="h-4 w-4 mr-1" />
-              {post.comments?.length || 0}
-            </Button>
-          </div>
-          <Button variant="ghost" size="sm">
-            <Share2 className="h-4 w-4" />
-          </Button>
-        </div>
+        {/* Unified Post Actions */}
+        <PostActions 
+          post={currentPost} 
+          showComments={false}
+          onPostUpdate={handlePostUpdate}
+        />
 
-        {/* Comments Section */}
-        {showComments && (
-          <div className="space-y-4 pt-4 border-t">
-            {/* Existing Comments */}
-            {post.comments && post.comments.length > 0 && (
-              <div className="space-y-3 max-h-60 overflow-y-auto">
-                {post.comments.map((comment) => (
-                  <div key={comment.id} className="flex items-start space-x-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={comment.profiles?.avatar_url || ""} />
-                      <AvatarFallback className="text-xs bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                        {comment.profiles?.username?.[0]?.toUpperCase() || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="bg-gray-100 rounded-lg px-3 py-2">
-                        <p className="text-sm font-medium">{comment.profiles?.username}</p>
-                        <p className="text-sm text-gray-700">{comment.content}</p>
-                      </div>
-                      <p className="text-xs text-gray-500 mt-1">
-                        {formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Add Comment */}
-            {user && (
-              <form onSubmit={handleComment} className="flex items-center space-x-2">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={user.user_metadata?.avatar_url || ""} />
-                  <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs">
-                    {user.email?.[0]?.toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 flex space-x-2">
-                  <Input
-                    placeholder="Add a comment..."
-                    value={commentText}
-                    onChange={(e) => setCommentText(e.target.value)}
-                    className="bg-white/50"
-                  />
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={!commentText.trim() || isLoading}
-                    className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </form>
-            )}
-          </div>
-        )}
       </CardContent>
     </Card>
   )
 }
+
+// Memoize PostCard, updates only when key data changes
+export const PostCard = memo(PostCardComponent, (prevProps, nextProps) => {
+  // Check each field separately for debugging
+  const idSame = prevProps.post.id === nextProps.post.id;
+  const likesSame = prevProps.post.likes_count === nextProps.post.likes_count;
+  const userLikedSame = prevProps.post.user_has_liked === nextProps.post.user_has_liked;
+  const commentsSame = prevProps.post.comments?.length === nextProps.post.comments?.length;
+  const prioritySame = prevProps.priority === nextProps.priority;
+  
+  const shouldSkipUpdate = idSame && likesSame && userLikedSame && commentsSame && prioritySame;
+  
+  if (!shouldSkipUpdate) {
+    console.log("PostCard WILL re-render for post:", nextProps.post.id, {
+      idSame,
+      likesSame: `${prevProps.post.likes_count} -> ${nextProps.post.likes_count} (${likesSame})`,
+      userLikedSame: `${prevProps.post.user_has_liked} -> ${nextProps.post.user_has_liked} (${userLikedSame})`,
+      commentsSame: `${prevProps.post.comments?.length} -> ${nextProps.post.comments?.length} (${commentsSame})`,
+      prioritySame
+    });
+  } else {
+    console.log("PostCard SKIP re-render for post:", nextProps.post.id);
+  }
+  
+  return shouldSkipUpdate;
+});

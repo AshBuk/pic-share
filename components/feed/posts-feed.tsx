@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useRef, useState, useMemo, memo } from "react"
 import { usePosts } from "@/hooks/use-posts"
 import { PostCard } from "./post-card"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,18 +13,79 @@ interface PostsFeedProps {
 }
 
 export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
-  const { posts, loading, error, refreshPosts } = usePosts()
+  const { posts, loading, error, hasMore, isLoadingMore, fetchNextPage, refreshPosts } = usePosts()
+  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  const [hasAutoLoaded, setHasAutoLoaded] = useState(false)
+  const [renderedPosts, setRenderedPosts] = useState<JSX.Element[]>([])
+  const previousPostsRef = useRef<any[]>([])
+
+  // Memoize posts individually
+  useEffect(() => {
+    console.log("PostsFeed: checking posts for memoization");
+    const newRenderedPosts: JSX.Element[] = [];
+    
+    posts.forEach((post, index) => {
+      const prevPost = previousPostsRef.current.find(p => p.id === post.id);
+      const priority = index < 2;
+      
+      // Check if the post has changed
+      const hasChanged = !prevPost || 
+        prevPost.likes_count !== post.likes_count ||
+        prevPost.user_has_liked !== post.user_has_liked ||
+        prevPost.comments?.length !== post.comments?.length ||
+        prevPost.comments !== post.comments; // also react to new array reference for comments
+      
+      if (hasChanged) {
+        console.log("Post changed, re-rendering:", post.id);
+        newRenderedPosts.push(
+          <PostCard key={post.id} post={post} priority={priority} />
+        );
+      } else {
+        // Find the old render for this post
+        const oldRender = renderedPosts.find(rendered => rendered.key === post.id);
+        if (oldRender) {
+          console.log("Post unchanged, reusing render:", post.id);
+          newRenderedPosts.push(oldRender);
+        } else {
+          console.log("Post unchanged but no old render, creating new:", post.id);
+          newRenderedPosts.push(
+            <PostCard key={post.id} post={post} priority={priority} />
+          );
+        }
+      }
+    });
+    
+    setRenderedPosts(newRenderedPosts);
+    previousPostsRef.current = [...posts];
+      }, [posts]); // Removed renderedPosts from dependencies
 
   const handleUploadSuccess = () => {
     refreshPosts()
     onUploadSuccess?.()
   }
 
+  useEffect(() => {
+    if (!sentinelRef.current || hasAutoLoaded) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (entry.isIntersecting) {
+          fetchNextPage()
+          setHasAutoLoaded(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: "200px" }
+    )
+    observer.observe(sentinelRef.current)
+    return () => observer.disconnect()
+  }, [sentinelRef.current, fetchNextPage, hasAutoLoaded])
+
   if (loading) {
     return (
       <div className="space-y-6">
         {[...Array(3)].map((_, i) => (
-          <Card key={i} className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+          <Card key={i} className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
             <CardContent className="p-6">
               <div className="animate-pulse space-y-4">
                 <div className="flex items-center space-x-3">
@@ -48,7 +110,7 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
 
   if (error) {
     return (
-      <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+      <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
         <CardContent className="p-6 text-center">
           <div className="text-red-600 mb-4">
             <p className="font-medium">Failed to load posts</p>
@@ -65,7 +127,7 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
 
   if (posts.length === 0) {
     return (
-      <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-lg">
+      <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <Camera className="h-5 w-5 text-blue-600" />
@@ -75,7 +137,7 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
         <CardContent className="text-center space-y-4">
           <div className="py-8">
             <Camera className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
               No posts yet. Be the first to share your amazing photos with the world!
             </p>
             <ImageUploadDialog onUploadSuccess={handleUploadSuccess}>
@@ -92,9 +154,15 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
 
   return (
     <div className="space-y-6">
-      {posts.map((post) => (
-        <PostCard key={post.id} post={post} />
-      ))}
+      {renderedPosts}
+      <div ref={sentinelRef} />
+      {hasMore && (
+        <div className="flex justify-center pt-2">
+          <Button onClick={fetchNextPage} variant="outline" disabled={isLoadingMore} aria-label="Load more posts">
+            {isLoadingMore ? "Loading..." : "Load more"}
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

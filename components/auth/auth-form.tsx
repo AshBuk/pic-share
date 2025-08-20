@@ -85,7 +85,7 @@ export function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
       <div className="w-full max-w-md space-y-8">
         {/* Header */}
         <div className="text-center space-y-4">
@@ -98,21 +98,21 @@ export function AuthForm() {
               PicShare
             </h1>
           </div>
-          <p className="text-gray-600">Share your moments with the world</p>
+          <p className="text-gray-600 dark:text-gray-300">Share your moments with the world</p>
         </div>
 
         {/* Auth Forms */}
-        <Card className="backdrop-blur-sm bg-white/80 border-0 shadow-xl">
+        <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-xl">
           <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Sign In</TabsTrigger>
-              <TabsTrigger value="signup">Sign Up</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2" aria-label="Auth tabs">
+              <TabsTrigger value="signin" aria-controls="signin-panel">Sign In</TabsTrigger>
+              <TabsTrigger value="signup" aria-controls="signup-panel">Sign Up</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="signin">
+            <TabsContent value="signin" id="signin-panel" role="tabpanel" aria-labelledby="Sign In">
               <CardHeader>
                 <CardTitle>Welcome back</CardTitle>
-                <CardDescription>Sign in to your account to continue sharing</CardDescription>
+                <CardDescription className="dark:text-gray-300">Sign in to your account to continue sharing</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={signInForm.handleSubmit(onSignIn)} className="space-y-4">
@@ -123,7 +123,7 @@ export function AuthForm() {
                       type="email"
                       placeholder="Enter your email"
                       {...signInForm.register("email")}
-                      className="bg-white/50"
+                      className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signInForm.formState.errors.email && (
                       <p className="text-sm text-red-600">{signInForm.formState.errors.email.message}</p>
@@ -137,7 +137,7 @@ export function AuthForm() {
                       type="password"
                       placeholder="Enter your password"
                       {...signInForm.register("password")}
-                      className="bg-white/50"
+                      className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signInForm.formState.errors.password && (
                       <p className="text-sm text-red-600">{signInForm.formState.errors.password.message}</p>
@@ -162,10 +162,10 @@ export function AuthForm() {
               </CardContent>
             </TabsContent>
 
-            <TabsContent value="signup">
+            <TabsContent value="signup" id="signup-panel" role="tabpanel" aria-labelledby="Sign Up">
               <CardHeader>
                 <CardTitle>Create account</CardTitle>
-                <CardDescription>Join PicShare and start sharing your photos</CardDescription>
+                <CardDescription className="dark:text-gray-300">Join PicShare and start sharing your photos</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={signUpForm.handleSubmit(onSignUp)} className="space-y-4">
@@ -176,7 +176,7 @@ export function AuthForm() {
                       type="email"
                       placeholder="Enter your email"
                       {...signUpForm.register("email")}
-                      className="bg-white/50"
+                      className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signUpForm.formState.errors.email && (
                       <p className="text-sm text-red-600">{signUpForm.formState.errors.email.message}</p>
@@ -190,7 +190,7 @@ export function AuthForm() {
                       type="text"
                       placeholder="Choose a username"
                       {...signUpForm.register("username")}
-                      className="bg-white/50"
+                      className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signUpForm.formState.errors.username && (
                       <p className="text-sm text-red-600">{signUpForm.formState.errors.username.message}</p>
@@ -204,7 +204,7 @@ export function AuthForm() {
                       type="text"
                       placeholder="Enter your full name"
                       {...signUpForm.register("fullName")}
-                      className="bg-white/50"
+                      className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                   </div>
 
@@ -215,7 +215,7 @@ export function AuthForm() {
                       type="password"
                       placeholder="Create a password"
                       {...signUpForm.register("password")}
-                      className="bg-white/50"
+                      className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signUpForm.formState.errors.password && (
                       <p className="text-sm text-red-600">{signUpForm.formState.errors.password.message}</p>
@@ -252,15 +252,15 @@ export function AuthForm() {
         <div className="grid grid-cols-3 gap-4 text-center">
           <div className="space-y-2">
             <Camera className="h-6 w-6 text-blue-600 mx-auto" />
-            <p className="text-sm text-gray-600">Share Photos</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Share Photos</p>
           </div>
           <div className="space-y-2">
             <Heart className="h-6 w-6 text-red-500 mx-auto" />
-            <p className="text-sm text-gray-600">Like & Comment</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Like & Comment</p>
           </div>
           <div className="space-y-2">
             <Share2 className="h-6 w-6 text-green-600 mx-auto" />
-            <p className="text-sm text-gray-600">Connect</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Connect</p>
           </div>
         </div>
       </div>

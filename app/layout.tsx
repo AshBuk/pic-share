@@ -6,11 +6,11 @@ import "./globals.css"
 import { ThemeProvider } from "next-themes"
 import { AuthProvider } from "@/hooks/use-auth"
 import { Toaster } from "react-hot-toast"
+import { ConsoleFilter } from "@/components/console-filter"
 
 export const metadata: Metadata = {
-  title: "v0 App",
-  description: "Created with v0",
-  generator: "v0.app",
+  title: "PicShare - Share Your Moments",
+  description: "Share your amazing photos with the world on PicShare",
 }
 
 export default function RootLayout({
@@ -19,19 +19,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <style>{`
-html {
-  font-family: ${GeistSans.style.fontFamily};
-  --font-sans: ${GeistSans.variable};
-  --font-mono: ${GeistMono.variable};
-}
-        `}</style>
-      </head>
-      <body className={`${GeistSans.variable} ${GeistMono.variable} antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+    <html lang="en" suppressHydrationWarning className={`${GeistSans.variable} ${GeistMono.variable}`}>
+      <head />
+      <body className={`${GeistSans.className} antialiased`} suppressHydrationWarning>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
           <AuthProvider>
+            <ConsoleFilter />
             {children}
             <Toaster />
           </AuthProvider>

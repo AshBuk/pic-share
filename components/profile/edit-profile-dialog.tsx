@@ -6,10 +6,9 @@ import { useState, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -23,7 +22,7 @@ const profileSchema = z.object({
     .min(3, "Username must be at least 3 characters")
     .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
   full_name: z.string().max(100, "Full name must be less than 100 characters").optional(),
-  bio: z.string().max(500, "Bio must be less than 500 characters").optional(),
+  // Bio removed
 })
 
 type ProfileForm = z.infer<typeof profileSchema>
@@ -37,7 +36,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { user, profile, updateProfile } = useAuth()
+  const { user, profile, updateProfile, deleteAccount } = useAuth()
   const { uploadAvatar, isUploading } = useAvatarUpload()
 
   const form = useForm<ProfileForm>({
@@ -45,7 +44,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
     defaultValues: {
       username: profile?.username || "",
       full_name: profile?.full_name || "",
-      bio: "", // Add bio field to profile type if needed
+      
     },
   })
 
@@ -86,7 +85,6 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
         form.reset({
           username: profile?.username || "",
           full_name: profile?.full_name || "",
-          bio: "",
         })
       }
     }
@@ -95,9 +93,10 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
+          <DialogDescription>Update your profile information and avatar.</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -121,7 +120,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
               </Button>
             </div>
             <p className="text-sm text-gray-600 text-center">Click the camera icon to change your profile picture</p>
-            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" onChange={handleAvatarChange} className="hidden" />
           </div>
 
           {/* Form Fields */}
@@ -132,7 +131,7 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
                 id="username"
                 placeholder="Enter your username"
                 {...form.register("username")}
-                className="bg-white/50"
+                className="bg-white/50 dark:bg-gray-700/50 dark:text-white dark:border-gray-600"
               />
               {form.formState.errors.username && (
                 <p className="text-sm text-red-600">{form.formState.errors.username.message}</p>
@@ -145,24 +144,14 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
                 id="full_name"
                 placeholder="Enter your full name"
                 {...form.register("full_name")}
-                className="bg-white/50"
+                className="bg-white/50 dark:bg-gray-700/50 dark:text-white dark:border-gray-600"
               />
               {form.formState.errors.full_name && (
                 <p className="text-sm text-red-600">{form.formState.errors.full_name.message}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                placeholder="Tell us about yourself..."
-                rows={3}
-                {...form.register("bio")}
-                className="bg-white/50 resize-none"
-              />
-              {form.formState.errors.bio && <p className="text-sm text-red-600">{form.formState.errors.bio.message}</p>}
-            </div>
+            {/* Bio removed */}
           </div>
 
           {/* Error Display */}
@@ -172,8 +161,22 @@ export function EditProfileDialog({ children, onSuccess }: EditProfileDialogProp
             </Alert>
           )}
 
-          {/* Submit Button */}
-          <div className="flex justify-end space-x-2">
+          {/* Actions */}
+          <div className="flex justify-between space-x-2">
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={async () => {
+                if (confirm("This will delete your account and all your posts. Are you sure?")) {
+                  await deleteAccount()
+                  setOpen(false)
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700"
+              disabled={isLoading || isUploading}
+            >
+              Delete Account
+            </Button>
             <Button
               type="button"
               variant="outline"

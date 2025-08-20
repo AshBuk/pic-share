@@ -6,7 +6,7 @@ import { useState, useRef } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -46,13 +46,14 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
   })
 
   const handleFileSelect = (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      form.setError("root", { message: "Please select an image file" })
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+    if (!allowedTypes.includes(file.type)) {
+      form.setError("root", { message: "Only JPG, PNG, or WEBP images are allowed" })
       return
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      form.setError("root", { message: "File size must be less than 10MB" })
+    if (file.size > 5 * 1024 * 1024) {
+      form.setError("root", { message: "File size must be less than 5MB" })
       return
     }
 
@@ -134,12 +135,15 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md dark:bg-gray-800 dark:border-gray-700">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <ImageIcon className="h-5 w-5 text-blue-600" />
             <span>Upload New Photo</span>
           </DialogTitle>
+          <DialogDescription>
+            Select an image file to upload and share with your followers. Supported formats: JPG, PNG, WEBP (max 5MB).
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -148,7 +152,7 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
             {!selectedFile ? (
               <Card
                 className={`border-2 border-dashed transition-colors cursor-pointer ${
-                  dragActive ? "border-blue-500 bg-blue-50" : "border-gray-300 hover:border-gray-400"
+                  dragActive ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
                 }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -156,19 +160,19 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-                  <Upload className="h-12 w-12 text-gray-400 mb-4" />
-                  <p className="text-lg font-medium text-gray-900 mb-2">Drop your image here</p>
-                  <p className="text-sm text-gray-500 mb-4">or click to browse files</p>
-                  <p className="text-xs text-gray-400">Supports: JPG, PNG, GIF (max 10MB)</p>
+                <CardContent className="flex flex-col items-center justify-center py-12 text-center" aria-label="Dropzone for image upload">
+                  <Upload className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" aria-hidden="true" />
+                  <p className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Drop your image here</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">or click to browse files</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">Supports: JPG, PNG, WEBP, GIF (max 5MB)</p>
                 </CardContent>
               </Card>
             ) : (
-              <Card>
+              <Card className="dark:bg-gray-700 dark:border-gray-600">
                 <CardContent className="p-4">
                   <div className="relative">
                     <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100">
-                      <Image src={previewUrl! || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                      <Image src={previewUrl! || "/placeholder.svg"} alt="Preview" fill className="object-cover" placeholder="blur" blurDataURL="/placeholder.svg" />
                     </div>
                     <Button
                       type="button"
@@ -180,8 +184,8 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
                       <X className="h-4 w-4" />
                     </Button>
                   </div>
-                  <p className="text-sm text-gray-600 mt-2 truncate">{selectedFile.name}</p>
-                  <p className="text-xs text-gray-400">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 truncate">{selectedFile.name}</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
                 </CardContent>
               </Card>
             )}
@@ -189,7 +193,7 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={handleFileInputChange}
               className="hidden"
             />
@@ -203,7 +207,7 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
                 id="title"
                 placeholder="Give your photo a title..."
                 {...form.register("title")}
-                className="bg-white/50"
+                className="bg-white/50 dark:bg-gray-700/50 dark:text-white dark:border-gray-600"
               />
               {form.formState.errors.title && (
                 <p className="text-sm text-red-600">{form.formState.errors.title.message}</p>
@@ -217,7 +221,7 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
                 placeholder="Tell us about your photo..."
                 rows={3}
                 {...form.register("description")}
-                className="bg-white/50 resize-none"
+                className="bg-white/50 dark:bg-gray-700/50 dark:text-white dark:border-gray-600 resize-none"
               />
               {form.formState.errors.description && (
                 <p className="text-sm text-red-600">{form.formState.errors.description.message}</p>
