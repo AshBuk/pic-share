@@ -2,7 +2,7 @@
 
 # 📸 PicShare
 
-> **A Technical Assignment Project** - Instagram-like photo sharing application built in 24 hours
+> **A Demo Project – Instagram-like photo sharing application built in 24 hours as part of a coding challenge
 
 </div>
 
@@ -15,7 +15,7 @@
 
 ## About This Project
 
-This is my **technical assignment submission** for a full stack developer position. The task was to create a **modern Instagram-like photo sharing application** with full functionality in a limited timeframe.
+This project was built as part of a coding challenge to demonstrate full-stack development skills. The task was to create a **modern Instagram-like photo sharing application** with full functionality in a limited timeframe.
 
 ## Live Demo
 
@@ -24,7 +24,7 @@ This is my **technical assignment submission** for a full stack developer positi
 ### Development Story
 
 **Timeline:** Built in ~24 hours  
-**Challenge:** Create a production-ready social media app from scratch.
+**Challenge:** Create a feature-complete demo social media app from scratch.
 
 **Development Process:**
 
