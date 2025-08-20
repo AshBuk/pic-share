@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
-import { useEffect, useState } from "react"
-import { useParams, useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { ArrowLeft } from "lucide-react"
-import Image from "next/image"
-import { formatDistanceToNow } from "date-fns"
-import { createClient } from "@/lib/supabase/client"
-import type { PostWithProfile } from "@/lib/supabase/types"
-import { useAuth } from "@/hooks/use-auth"
-import { forceRefreshFeed } from "@/hooks/use-posts"
-import { PostActions } from "@/components/shared/post-actions"
+import { useEffect, useState } from 'react'
+import { useParams, useRouter } from 'next/navigation'
+import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { ArrowLeft } from 'lucide-react'
+import Image from 'next/image'
+import { formatDistanceToNow } from 'date-fns'
+import { createClient } from '@/lib/supabase/client'
+import type { PostWithProfile } from '@/lib/supabase/types'
+import { useAuth } from '@/hooks/use-auth'
+import { forceRefreshFeed } from '@/hooks/use-posts'
+import { PostActions } from '@/components/shared/post-actions'
 
 export default function PostDetailPage() {
   const params = useParams()
@@ -22,7 +22,7 @@ export default function PostDetailPage() {
   const [post, setPost] = useState<PostWithProfile | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const postId = (params?.id as string) || ""
+  const postId = (params?.id as string) || ''
 
   const handlePostUpdate = (updatedPost: PostWithProfile) => {
     setPost(updatedPost)
@@ -31,10 +31,11 @@ export default function PostDetailPage() {
   // Refetch post data to get latest comments and likes
   const refetchPost = async () => {
     if (!postId) return
-    
+
     const { data, error } = await supabase
-      .from("posts")
-      .select(`
+      .from('posts')
+      .select(
+        `
         *,
         profiles:user_id (
           id,
@@ -63,16 +64,15 @@ export default function PostDetailPage() {
             created_at
           )
         )
-      `)
-      .eq("id", postId)
+      `
+      )
+      .eq('id', postId)
       .single()
 
     if (!error && data) {
       const normalizedComments = ((data.comments || []) as any[])
         .slice()
-        .sort(
-          (a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-        )
+        .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
         .map((c: any) => ({
           ...c,
           profiles: Array.isArray(c.profiles) ? c.profiles[0] : c.profiles,
@@ -90,8 +90,9 @@ export default function PostDetailPage() {
     const fetchPost = async () => {
       setLoading(true)
       const { data, error } = await supabase
-        .from("posts")
-        .select(`
+        .from('posts')
+        .select(
+          `
           *,
           profiles:user_id (
             id,
@@ -120,16 +121,15 @@ export default function PostDetailPage() {
               created_at
             )
           )
-        `)
-        .eq("id", postId)
+        `
+        )
+        .eq('id', postId)
         .single()
 
       if (!error && data) {
         const normalizedComments = ((data.comments || []) as any[])
           .slice()
-          .sort(
-            (a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
-          )
+          .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
           .map((c: any) => ({
             ...c,
             profiles: Array.isArray(c.profiles) ? c.profiles[0] : c.profiles,
@@ -154,22 +154,22 @@ export default function PostDetailPage() {
   // Refresh post data when window gains focus
   useEffect(() => {
     const handleFocus = () => {
-      console.log("Post detail: window focused, refreshing post data");
-      refetchPost();
-    };
-    
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, [postId, user]);
+      console.log('Post detail: window focused, refreshing post data')
+      refetchPost()
+    }
+
+    window.addEventListener('focus', handleFocus)
+    return () => window.removeEventListener('focus', handleFocus)
+  }, [postId, user])
 
   // Force refresh feed when navigating away from post page
   useEffect(() => {
     return () => {
       // Cleanup: force refresh feed when leaving post page
-      console.log("Post detail: cleaning up, force refreshing feed");
-      forceRefreshFeed();
-    };
-  }, []);
+      console.log('Post detail: cleaning up, force refreshing feed')
+      forceRefreshFeed()
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
@@ -198,15 +198,18 @@ export default function PostDetailPage() {
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <Avatar>
-                  <AvatarImage src={post.profiles?.avatar_url || ""} />
+                  <AvatarImage src={post.profiles?.avatar_url || ''} />
                   <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                    {post.profiles?.username?.[0]?.toUpperCase() || "U"}
+                    {post.profiles?.username?.[0]?.toUpperCase() || 'U'}
                   </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-semibold">{post.profiles?.full_name || post.profiles?.username}</p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    @{post.profiles?.username} • {post.created_at ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true }) : 'Unknown time'}
+                    @{post.profiles?.username} •{' '}
+                    {post.created_at
+                      ? formatDistanceToNow(new Date(post.created_at), { addSuffix: true })
+                      : 'Unknown time'}
                   </p>
                 </div>
               </div>
@@ -229,12 +232,7 @@ export default function PostDetailPage() {
               </div>
 
               {/* Unified Post Actions */}
-              <PostActions 
-                post={post} 
-                showComments={true}
-                maxHeightClass="max-h-96"
-                onPostUpdate={handlePostUpdate}
-              />
+              <PostActions post={post} showComments={true} maxHeightClass="max-h-96" onPostUpdate={handlePostUpdate} />
             </CardContent>
           </Card>
         )}
@@ -242,5 +240,3 @@ export default function PostDetailPage() {
     </div>
   )
 }
-
-

@@ -1,30 +1,30 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, Camera, Heart, Share2 } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
+import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2, Camera, Heart, Share2 } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
 
 const signInSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
 const signUpSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
   username: z
     .string()
-    .min(3, "Username must be at least 3 characters")
-    .regex(/^[a-zA-Z0-9_]+$/, "Username can only contain letters, numbers, and underscores"),
+    .min(3, 'Username must be at least 3 characters')
+    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
   fullName: z.string().optional(),
 })
 
@@ -40,18 +40,18 @@ export function AuthForm() {
   const signInForm = useForm<SignInForm>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   })
 
   const signUpForm = useForm<SignUpForm>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      email: "",
-      password: "",
-      username: "",
-      fullName: "",
+      email: '',
+      password: '',
+      username: '',
+      fullName: '',
     },
   })
 
@@ -78,7 +78,7 @@ export function AuthForm() {
     if (error) {
       setError(error.message)
     } else {
-      setSuccess("Check your email for the confirmation link!")
+      setSuccess('Check your email for the confirmation link!')
     }
 
     setIsLoading(false)
@@ -105,14 +105,20 @@ export function AuthForm() {
         <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-xl">
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2" aria-label="Auth tabs">
-              <TabsTrigger value="signin" aria-controls="signin-panel">Sign In</TabsTrigger>
-              <TabsTrigger value="signup" aria-controls="signup-panel">Sign Up</TabsTrigger>
+              <TabsTrigger value="signin" aria-controls="signin-panel">
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger value="signup" aria-controls="signup-panel">
+                Sign Up
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="signin" id="signin-panel" role="tabpanel" aria-labelledby="Sign In">
               <CardHeader>
                 <CardTitle>Welcome back</CardTitle>
-                <CardDescription className="dark:text-gray-300">Sign in to your account to continue sharing</CardDescription>
+                <CardDescription className="dark:text-gray-300">
+                  Sign in to your account to continue sharing
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={signInForm.handleSubmit(onSignIn)} className="space-y-4">
@@ -122,7 +128,7 @@ export function AuthForm() {
                       id="signin-email"
                       type="email"
                       placeholder="Enter your email"
-                      {...signInForm.register("email")}
+                      {...signInForm.register('email')}
                       className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signInForm.formState.errors.email && (
@@ -136,7 +142,7 @@ export function AuthForm() {
                       id="signin-password"
                       type="password"
                       placeholder="Enter your password"
-                      {...signInForm.register("password")}
+                      {...signInForm.register('password')}
                       className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signInForm.formState.errors.password && (
@@ -165,7 +171,9 @@ export function AuthForm() {
             <TabsContent value="signup" id="signup-panel" role="tabpanel" aria-labelledby="Sign Up">
               <CardHeader>
                 <CardTitle>Create account</CardTitle>
-                <CardDescription className="dark:text-gray-300">Join PicShare and start sharing your photos</CardDescription>
+                <CardDescription className="dark:text-gray-300">
+                  Join PicShare and start sharing your photos
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={signUpForm.handleSubmit(onSignUp)} className="space-y-4">
@@ -175,7 +183,7 @@ export function AuthForm() {
                       id="signup-email"
                       type="email"
                       placeholder="Enter your email"
-                      {...signUpForm.register("email")}
+                      {...signUpForm.register('email')}
                       className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signUpForm.formState.errors.email && (
@@ -189,7 +197,7 @@ export function AuthForm() {
                       id="signup-username"
                       type="text"
                       placeholder="Choose a username"
-                      {...signUpForm.register("username")}
+                      {...signUpForm.register('username')}
                       className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signUpForm.formState.errors.username && (
@@ -203,7 +211,7 @@ export function AuthForm() {
                       id="signup-fullname"
                       type="text"
                       placeholder="Enter your full name"
-                      {...signUpForm.register("fullName")}
+                      {...signUpForm.register('fullName')}
                       className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                   </div>
@@ -214,7 +222,7 @@ export function AuthForm() {
                       id="signup-password"
                       type="password"
                       placeholder="Create a password"
-                      {...signUpForm.register("password")}
+                      {...signUpForm.register('password')}
                       className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
                     />
                     {signUpForm.formState.errors.password && (

@@ -1,12 +1,12 @@
-"use client"
+'use client'
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Heart, MessageCircle, Share2 } from "lucide-react"
-import { useAuth } from "@/hooks/use-auth"
-import { usePostActions } from "@/hooks/use-post-actions"
-import { CommentsSection } from "@/components/feed/comments-section"
-import type { PostWithProfile } from "@/lib/supabase/types"
+import { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
+import { Heart, MessageCircle, Share2 } from 'lucide-react'
+import { useAuth } from '@/hooks/use-auth'
+import { usePostActions } from '@/hooks/use-post-actions'
+import { CommentsSection } from '@/components/feed/comments-section'
+import type { PostWithProfile } from '@/lib/supabase/types'
 
 interface PostActionsProps {
   post: PostWithProfile
@@ -15,11 +15,11 @@ interface PostActionsProps {
   onPostUpdate?: (updatedPost: PostWithProfile) => void
 }
 
-export function PostActions({ 
-  post, 
-  showComments = false, 
-  maxHeightClass = "max-h-60",
-  onPostUpdate 
+export function PostActions({
+  post,
+  showComments = false,
+  maxHeightClass = 'max-h-60',
+  onPostUpdate,
 }: PostActionsProps) {
   const { user } = useAuth()
   const { toggleLike, isLoading } = usePostActions()
@@ -36,22 +36,22 @@ export function PostActions({
 
     // Optimistic update
     const newLikedState = !optimisticPost.user_has_liked
-    const newLikesCount = newLikedState 
-      ? (optimisticPost.likes_count || 0) + 1 
+    const newLikesCount = newLikedState
+      ? (optimisticPost.likes_count || 0) + 1
       : Math.max((optimisticPost.likes_count || 0) - 1, 0)
-    
+
     const optimisticUpdate = {
       ...post, // Use original post to preserve all fields
       ...optimisticPost, // Apply current optimistic changes
       user_has_liked: newLikedState,
-      likes_count: newLikesCount
+      likes_count: newLikesCount,
     }
-    
+
     setOptimisticPost(optimisticUpdate)
     onPostUpdate?.(optimisticUpdate)
 
     const result = await toggleLike(post.id, post.user_has_liked)
-    
+
     // If error, rollback
     if (result?.error) {
       setOptimisticPost(post)
@@ -71,24 +71,24 @@ export function PostActions({
             size="sm"
             onClick={handleLike}
             disabled={isLoading}
-            className={optimisticPost.user_has_liked ? "text-red-500" : ""}
-            aria-label={optimisticPost.user_has_liked ? "Unlike post" : "Like post"}
+            className={optimisticPost.user_has_liked ? 'text-red-500' : ''}
+            aria-label={optimisticPost.user_has_liked ? 'Unlike post' : 'Like post'}
           >
-            <Heart className={`h-4 w-4 mr-1 ${optimisticPost.user_has_liked ? "fill-current" : ""}`} />
+            <Heart className={`h-4 w-4 mr-1 ${optimisticPost.user_has_liked ? 'fill-current' : ''}`} />
             {optimisticPost.likes_count || 0}
           </Button>
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setShowCommentsState(!showCommentsState)} 
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowCommentsState(!showCommentsState)}
             aria-label="Toggle comments"
           >
             <MessageCircle className="h-4 w-4 mr-1" />
             {optimisticPost.comments?.length || 0}
           </Button>
         </div>
-        
+
         <Button variant="ghost" size="sm" aria-label="Share post">
           <Share2 className="h-4 w-4" />
         </Button>
@@ -96,9 +96,9 @@ export function PostActions({
 
       {/* Comments section */}
       {showCommentsState && (
-        <CommentsSection 
-          postId={optimisticPost.id} 
-          comments={optimisticPost.comments as any} 
+        <CommentsSection
+          postId={optimisticPost.id}
+          comments={optimisticPost.comments as any}
           maxHeightClass={maxHeightClass}
         />
       )}

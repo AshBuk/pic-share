@@ -1,5 +1,5 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js"
-import type { Database } from "./types"
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
+import type { Database } from './types'
 
 let supabaseInstance: ReturnType<typeof createSupabaseClient<Database>> | null = null
 
@@ -17,9 +17,9 @@ export const createClient = () => {
         },
         global: {
           headers: {
-            'x-application-name': 'picshare'
-          }
-        }
+            'x-application-name': 'picshare',
+          },
+        },
       }
     )
   }
