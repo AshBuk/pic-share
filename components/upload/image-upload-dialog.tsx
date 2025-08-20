@@ -1,25 +1,32 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useState, useRef } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import * as z from "zod"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent } from "@/components/ui/card"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Upload, X, ImageIcon, Loader2 } from "lucide-react"
-import { useImageUpload } from "@/hooks/use-image-upload"
-import Image from "next/image"
+import { useState, useRef } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
+import { Label } from '@/components/ui/label'
+import { Card, CardContent } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Upload, X, ImageIcon, Loader2 } from 'lucide-react'
+import { useImageUpload } from '@/hooks/use-image-upload'
+import Image from 'next/image'
 
 const uploadSchema = z.object({
-  title: z.string().min(1, "Title is required").max(100, "Title must be less than 100 characters"),
-  description: z.string().max(500, "Description must be less than 500 characters").optional(),
+  title: z.string().min(1, 'Title is required').max(100, 'Title must be less than 100 characters'),
+  description: z.string().max(500, 'Description must be less than 500 characters').optional(),
 })
 
 type UploadForm = z.infer<typeof uploadSchema>
@@ -40,35 +47,35 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
   const form = useForm<UploadForm>({
     resolver: zodResolver(uploadSchema),
     defaultValues: {
-      title: "",
-      description: "",
+      title: '',
+      description: '',
     },
   })
 
   const handleFileSelect = (file: File) => {
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
     if (!allowedTypes.includes(file.type)) {
-      form.setError("root", { message: "Only JPG, PNG, or WEBP images are allowed" })
+      form.setError('root', { message: 'Only JPG, PNG, or WEBP images are allowed' })
       return
     }
 
     if (file.size > 5 * 1024 * 1024) {
-      form.setError("root", { message: "File size must be less than 5MB" })
+      form.setError('root', { message: 'File size must be less than 5MB' })
       return
     }
 
     setSelectedFile(file)
     const url = URL.createObjectURL(file)
     setPreviewUrl(url)
-    form.clearErrors("root")
+    form.clearErrors('root')
   }
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    if (e.type === "dragenter" || e.type === "dragover") {
+    if (e.type === 'dragenter' || e.type === 'dragover') {
       setDragActive(true)
-    } else if (e.type === "dragleave") {
+    } else if (e.type === 'dragleave') {
       setDragActive(false)
     }
   }
@@ -98,13 +105,13 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
       setPreviewUrl(null)
     }
     if (fileInputRef.current) {
-      fileInputRef.current.value = ""
+      fileInputRef.current.value = ''
     }
   }
 
   const onSubmit = async (data: UploadForm) => {
     if (!selectedFile) {
-      form.setError("root", { message: "Please select an image" })
+      form.setError('root', { message: 'Please select an image' })
       return
     }
 
@@ -152,7 +159,9 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
             {!selectedFile ? (
               <Card
                 className={`border-2 border-dashed transition-colors cursor-pointer ${
-                  dragActive ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20" : "border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500"
+                  dragActive
+                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                    : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
                 }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -160,7 +169,10 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
               >
-                <CardContent className="flex flex-col items-center justify-center py-12 text-center" aria-label="Dropzone for image upload">
+                <CardContent
+                  className="flex flex-col items-center justify-center py-12 text-center"
+                  aria-label="Dropzone for image upload"
+                >
                   <Upload className="h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" aria-hidden="true" />
                   <p className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Drop your image here</p>
                   <p className="text-sm text-gray-500 dark:text-gray-300 mb-4">or click to browse files</p>
@@ -172,7 +184,14 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
                 <CardContent className="p-4">
                   <div className="relative">
                     <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100">
-                      <Image src={previewUrl! || "/placeholder.svg"} alt="Preview" fill className="object-cover" placeholder="blur" blurDataURL="/placeholder.svg" />
+                      <Image
+                        src={previewUrl! || '/placeholder.svg'}
+                        alt="Preview"
+                        fill
+                        className="object-cover"
+                        placeholder="blur"
+                        blurDataURL="/placeholder.svg"
+                      />
                     </div>
                     <Button
                       type="button"
@@ -185,7 +204,9 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
                     </Button>
                   </div>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 truncate">{selectedFile.name}</p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
+                    {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                  </p>
                 </CardContent>
               </Card>
             )}
@@ -206,7 +227,7 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
               <Input
                 id="title"
                 placeholder="Give your photo a title..."
-                {...form.register("title")}
+                {...form.register('title')}
                 className="bg-white/50 dark:bg-gray-700/50 dark:text-white dark:border-gray-600"
               />
               {form.formState.errors.title && (
@@ -220,7 +241,7 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
                 id="description"
                 placeholder="Tell us about your photo..."
                 rows={3}
-                {...form.register("description")}
+                {...form.register('description')}
                 className="bg-white/50 dark:bg-gray-700/50 dark:text-white dark:border-gray-600 resize-none"
               />
               {form.formState.errors.description && (
@@ -247,7 +268,7 @@ export function ImageUploadDialog({ children, onUploadSuccess }: ImageUploadDial
               disabled={isUploading || !selectedFile}
             >
               {isUploading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isUploading ? "Uploading..." : "Share Photo"}
+              {isUploading ? 'Uploading...' : 'Share Photo'}
             </Button>
           </div>
         </form>

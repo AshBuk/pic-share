@@ -57,6 +57,9 @@ CREATE POLICY "Users can insert their own profile" ON profiles
 CREATE POLICY "Users can update their own profile" ON profiles
   FOR UPDATE USING (auth.uid() = id);
 
+CREATE POLICY "Users can delete their own profile" ON profiles
+  FOR DELETE USING (auth.uid() = id);
+
 -- Create policies for posts
 CREATE POLICY "Posts are viewable by everyone" ON posts
   FOR SELECT USING (true);

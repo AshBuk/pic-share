@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import { ProtectedRoute } from "@/components/auth/protected-route"
-import { UserProfile } from "@/components/profile/user-profile"
-import { Button } from "@/components/ui/button"
-import { Camera, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { ProtectedRoute } from '@/components/auth/protected-route'
+import { UserProfile } from '@/components/profile/user-profile'
+import { Button } from '@/components/ui/button'
+import { Camera, ArrowLeft } from 'lucide-react'
+import Link from 'next/link'
 
 export default function ProfilePage() {
   return (

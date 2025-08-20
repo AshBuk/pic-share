@@ -1,14 +1,14 @@
-"use client"
+'use client'
 
-import { useState } from "react"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Pencil, Trash2, X, Send } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
-import { useAuth } from "@/hooks/use-auth"
-import { usePostActions } from "@/hooks/use-post-actions"
-import type { Profile, Comment as CommentType } from "@/lib/supabase/types"
+import { useState } from 'react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Pencil, Trash2, X, Send } from 'lucide-react'
+import { formatDistanceToNow } from 'date-fns'
+import { useAuth } from '@/hooks/use-auth'
+import { usePostActions } from '@/hooks/use-post-actions'
+import type { Profile, Comment as CommentType } from '@/lib/supabase/types'
 
 type CommentWithProfile = CommentType & { profiles: Profile }
 
@@ -18,19 +18,19 @@ interface CommentsSectionProps {
   maxHeightClass?: string
 }
 
-export function CommentsSection({ postId, comments, maxHeightClass = "max-h-60" }: CommentsSectionProps) {
+export function CommentsSection({ postId, comments, maxHeightClass = 'max-h-60' }: CommentsSectionProps) {
   const { user } = useAuth()
   const { addComment, updateComment, deleteComment, isLoading } = usePostActions()
-  const [commentText, setCommentText] = useState("")
+  const [commentText, setCommentText] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
-  const [editingText, setEditingText] = useState("")
+  const [editingText, setEditingText] = useState('')
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!commentText.trim()) return
     const { error } = await addComment(postId, commentText)
     if (!error) {
-      setCommentText("")
+      setCommentText('')
       // Note: Real comments update will come from the database/real-time subscription
       // This is just a placeholder - actual update happens via refreshFeedComments()
     }
@@ -43,9 +43,9 @@ export function CommentsSection({ postId, comments, maxHeightClass = "max-h-60" 
           {comments.map((comment) => (
             <div key={comment.id} className="flex items-start space-x-2">
               <Avatar className="h-6 w-6">
-                <AvatarImage src={comment.profiles?.avatar_url || ""} />
+                <AvatarImage src={comment.profiles?.avatar_url || ''} />
                 <AvatarFallback className="text-xs bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                  {comment.profiles?.username?.[0]?.toUpperCase() || "U"}
+                  {comment.profiles?.username?.[0]?.toUpperCase() || 'U'}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
@@ -70,8 +70,16 @@ export function CommentsSection({ postId, comments, maxHeightClass = "max-h-60" 
                         className="bg-gray-200 dark:bg-gray-600 border-gray-300 dark:border-gray-500"
                         aria-label="Edit comment"
                       />
-                      <Button type="submit" size="sm">Save</Button>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => setEditingId(null)} aria-label="Cancel editing">
+                      <Button type="submit" size="sm">
+                        Save
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingId(null)}
+                        aria-label="Cancel editing"
+                      >
                         <X className="h-4 w-4" />
                       </Button>
                     </form>
@@ -88,7 +96,10 @@ export function CommentsSection({ postId, comments, maxHeightClass = "max-h-60" 
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => { setEditingId(comment.id); setEditingText(comment.content) }}
+                    onClick={() => {
+                      setEditingId(comment.id)
+                      setEditingText(comment.content)
+                    }}
                     aria-label="Edit comment"
                   >
                     <Pencil className="h-4 w-4" />
@@ -119,7 +130,7 @@ export function CommentsSection({ postId, comments, maxHeightClass = "max-h-60" 
       {user && (
         <form onSubmit={handleAdd} className="flex items-center space-x-2">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={user.user_metadata?.avatar_url || ""} />
+            <AvatarImage src={user.user_metadata?.avatar_url || ''} />
             <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs">
               {user.email?.[0]?.toUpperCase()}
             </AvatarFallback>
@@ -147,5 +158,3 @@ export function CommentsSection({ postId, comments, maxHeightClass = "max-h-60" 
     </div>
   )
 }
-
-

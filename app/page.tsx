@@ -1,18 +1,18 @@
-"use client"
+'use client'
 
-import { ProtectedRoute } from "@/components/auth/protected-route"
-import { useAuth } from "@/hooks/use-auth"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Camera, Plus, LogOut, Sun, Moon } from "lucide-react"
-import { ImageUploadDialog } from "@/components/upload/image-upload-dialog"
-import { forceRefreshFeed } from "@/hooks/use-posts"
-import { PostsFeed } from "@/components/feed/posts-feed"
-import Link from "next/link"
-import { useTheme } from "next-themes"
-import { useEffect, useRef, useState } from "react"
-import { createClient } from "@/lib/supabase/client"
+import { ProtectedRoute } from '@/components/auth/protected-route'
+import { useAuth } from '@/hooks/use-auth'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Camera, Plus, LogOut, Sun, Moon } from 'lucide-react'
+import { ImageUploadDialog } from '@/components/upload/image-upload-dialog'
+import { forceRefreshFeed } from '@/hooks/use-posts'
+import { PostsFeed } from '@/components/feed/posts-feed'
+import Link from 'next/link'
+import { useTheme } from 'next-themes'
+import { useEffect, useRef, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 function Dashboard() {
   const { user, profile, signOut } = useAuth()
@@ -22,47 +22,35 @@ function Dashboard() {
   const [postsCount, setPostsCount] = useState(0)
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
 
-  const currentTheme = theme === "system" ? systemTheme : theme
+  const currentTheme = theme === 'system' ? systemTheme : theme
 
   const ThemeToggle = () => (
     <Button
       variant="outline"
       size="sm"
-      onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
+      onClick={() => setTheme(currentTheme === 'dark' ? 'light' : 'dark')}
       aria-label="Toggle theme"
     >
-      {currentTheme === "dark" ? (
-        <Sun className="h-4 w-4" />
-      ) : (
-        <Moon className="h-4 w-4" />
-      )}
+      {currentTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
     </Button>
   )
 
   const fetchPostsCount = async () => {
     if (!user) return
     const { count, error } = await supabase
-      .from("posts")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id)
-    if (!error && typeof count === "number") setPostsCount(count)
+      .from('posts')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+    if (!error && typeof count === 'number') setPostsCount(count)
   }
 
   useEffect(() => {
     fetchPostsCount()
     channelRef.current?.unsubscribe()
     const channel = supabase
-      .channel("realtime:posts-count")
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "posts" },
-        fetchPostsCount
-      )
-      .on(
-        "postgres_changes",
-        { event: "DELETE", schema: "public", table: "posts" },
-        fetchPostsCount
-      )
+      .channel('realtime:posts-count')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'posts' }, fetchPostsCount)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'posts' }, fetchPostsCount)
       .subscribe()
     channelRef.current = channel
     return () => {
@@ -96,12 +84,14 @@ function Dashboard() {
             <Link href="/profile">
               <div className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={profile?.avatar_url || ""} />
+                  <AvatarImage src={profile?.avatar_url || ''} />
                   <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                     {profile?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">{profile?.username || user?.email}</span>
+                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                  {profile?.username || user?.email}
+                </span>
               </div>
             </Link>
 
@@ -125,13 +115,13 @@ function Dashboard() {
             {/* Profile Card */}
             <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
               <CardHeader className="text-center">
-                <CardTitle>{profile?.full_name || "Your Profile"}</CardTitle>
+                <CardTitle>{profile?.full_name || 'Your Profile'}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <Link href="/profile">
                   <div className="flex flex-col items-center space-y-3 cursor-pointer hover:opacity-80 transition-opacity">
                     <Avatar className="h-14 w-14">
-                      <AvatarImage src={profile?.avatar_url || ""} />
+                      <AvatarImage src={profile?.avatar_url || ''} />
                       <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                         {profile?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
                       </AvatarFallback>

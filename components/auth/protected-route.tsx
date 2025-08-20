@@ -1,10 +1,10 @@
-"use client"
+'use client'
 
-import type React from "react"
+import type React from 'react'
 
-import { useAuth } from "@/hooks/use-auth"
-import { AuthForm } from "./auth-form"
-import { Loader2 } from "lucide-react"
+import { useAuth } from '@/hooks/use-auth'
+import { AuthForm } from './auth-form'
+import { Loader2 } from 'lucide-react'
 
 interface ProtectedRouteProps {
   children: React.ReactNode
