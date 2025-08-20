@@ -23,11 +23,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
 
   const fetchProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single()
-      if (!error) {
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Profile fetch timeout')), 10000)
+      )
+
+      const fetchPromise = supabase.from('profiles').select('*').eq('id', userId).single()
+
+      const { data, error } = (await Promise.race([fetchPromise, timeoutPromise])) as any
+
+      if (!error && data) {
         setProfile(data)
       }
     } catch (error) {
@@ -40,9 +48,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const getSession = async () => {
       try {
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Session fetch timeout')), 10000)
+        )
+
+        const sessionPromise = supabase.auth.getSession()
+
         const {
           data: { session },
-        } = await supabase.auth.getSession()
+        } = (await Promise.race([sessionPromise, timeoutPromise])) as any
 
         if (mounted) {
           setUser(session?.user ?? null)
@@ -50,10 +64,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             await fetchProfile(session.user.id)
           }
           setLoading(false)
+          setInitialized(true)
         }
       } catch (error) {
+        console.error('Error getting session:', error)
         if (mounted) {
           setLoading(false)
+          setInitialized(true)
         }
       }
     }
@@ -75,15 +92,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     })
 
     const handleBeforeUnload = () => {
-      supabase.auth.signOut()
+      if (initialized && user) {
+        supabase.auth.signOut()
+      }
     }
 
-    window.addEventListener('beforeunload', handleBeforeUnload)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeunload', handleBeforeUnload)
+    }
 
     return () => {
       mounted = false
       subscription.unsubscribe()
-      window.removeEventListener('beforeunload', handleBeforeUnload)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('beforeunload', handleBeforeUnload)
+      }
     }
   }, [])
 
