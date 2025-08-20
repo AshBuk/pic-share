@@ -74,9 +74,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
+    const handleBeforeUnload = () => {
+      supabase.auth.signOut()
+    }
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
     return () => {
       mounted = false
       subscription.unsubscribe()
+      window.removeEventListener('beforeunload', handleBeforeUnload)
     }
   }, [])
 
