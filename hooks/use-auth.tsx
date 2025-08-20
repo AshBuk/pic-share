@@ -133,20 +133,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return { error: "No user logged in" }
     const userId = user.id
     try {
-      // Delete user data first (RLS allows deleting own rows)
-      await supabase.from("likes").delete().eq("user_id", userId)
-      await supabase.from("comments").delete().eq("user_id", userId)
-      await supabase.from("posts").delete().eq("user_id", userId)
+      // Get user's images for cleanup
+      const { data: posts } = await supabase
+        .from("posts")
+        .select("image_url")
+        .eq("user_id", userId)
 
-      // Try to delete profile (may fail if no DELETE policy)
-      await supabase.from("profiles").delete().eq("id", userId)
+      // Delete profile first - CASCADE will handle all related data
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", userId)
+      
+      if (profileError) throw profileError
+
+      // Clean up images from storage (best effort - don't fail if errors)
+      if (posts && posts.length > 0) {
+        const imagePaths = posts.map(post => {
+          const fileName = post.image_url.split('/').pop()
+          return `${userId}/${fileName}`
+        }).filter(Boolean)
         
-      // Sign out locally
+        if (imagePaths.length > 0) {
+          await supabase.storage.from("images").remove(imagePaths)
+        }
+      }
+
+      // Sign out locally  
       await supabase.auth.signOut()
       setProfile(null)
       setUser(null)
       return { error: null }
     } catch (error) {
+      console.error("Delete account error:", error)
       return { error }
     }
   }
