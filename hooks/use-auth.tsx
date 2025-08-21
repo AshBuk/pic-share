@@ -91,22 +91,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
-    const handleBeforeUnload = () => {
-      if (initialized && user) {
-        supabase.auth.signOut()
-      }
-    }
-
-    if (typeof window !== 'undefined') {
-      window.addEventListener('beforeunload', handleBeforeUnload)
-    }
-
     return () => {
       mounted = false
       subscription.unsubscribe()
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('beforeunload', handleBeforeUnload)
-      }
     }
   }, [])
 

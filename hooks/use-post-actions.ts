@@ -21,29 +21,30 @@ export function usePostActions() {
 
     try {
       if (isLiked) {
-        // Unlike
+        // Unlike — idempotent delete
         const { error } = await supabase.from('likes').delete().eq('post_id', postId).eq('user_id', user.id)
-
         if (error) throw error
-        // Update feed immediately after successful like removal
         setTimeout(() => refreshFeedLikes(), 50)
         return { error: null }
       } else {
-        // Like
-        const { error } = await supabase.from('likes').insert({
-          post_id: postId,
-          user_id: user.id,
-        })
+        // Like — upsert ignore duplicates to avoid 409 on races
+        const { error } = await supabase
+          .from('likes')
+          .upsert({ post_id: postId, user_id: user.id }, { onConflict: 'user_id,post_id', ignoreDuplicates: true })
 
-        if (error) throw error
-        // Update feed immediately after successful like addition
+        if (error && error.code !== '23505') throw error // treat duplicate as success
         setTimeout(() => refreshFeedLikes(), 50)
         return { error: null }
       }
     } catch (error: any) {
+      // Handle duplicate upserts gracefully
+      if (error?.code === '23505') {
+        setTimeout(() => refreshFeedLikes(), 50)
+        return { error: null }
+      }
       console.error('Error toggling like:', error)
       toast.error('Failed to update like')
-      return { error: error.message }
+      return { error: error?.message || 'unknown' }
     } finally {
       setIsLoading(false)
     }

@@ -21,7 +21,6 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
 
   // Memoize posts individually
   useEffect(() => {
-    console.log('PostsFeed: checking posts for memoization')
     const newRenderedPosts: JSX.Element[] = []
 
     posts.forEach((post, index) => {
@@ -37,16 +36,13 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
         prevPost.comments !== post.comments // also react to new array reference for comments
 
       if (hasChanged) {
-        console.log('Post changed, re-rendering:', post.id)
         newRenderedPosts.push(<PostCard key={post.id} post={post} priority={priority} />)
       } else {
         // Find the old render for this post
         const oldRender = renderedPosts.find((rendered) => rendered.key === post.id)
         if (oldRender) {
-          console.log('Post unchanged, reusing render:', post.id)
           newRenderedPosts.push(oldRender)
         } else {
-          console.log('Post unchanged but no old render, creating new:', post.id)
           newRenderedPosts.push(<PostCard key={post.id} post={post} priority={priority} />)
         }
       }
@@ -54,7 +50,8 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
 
     setRenderedPosts(newRenderedPosts)
     previousPostsRef.current = [...posts]
-  }, [posts]) // Removed renderedPosts from dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [posts])
 
   const handleUploadSuccess = () => {
     refreshPosts()
@@ -76,7 +73,7 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
     )
     observer.observe(sentinelRef.current)
     return () => observer.disconnect()
-  }, [sentinelRef.current, fetchNextPage, hasAutoLoaded])
+  }, [fetchNextPage, hasAutoLoaded])
 
   if (loading) {
     return (

@@ -2,7 +2,7 @@
 
 # 📸 PicShare
 
-> **A Demo Project – Instagram-like photo sharing application built in 24 hours as part of a coding challenge
+> \*\*A Demo Project – Instagram-like photo sharing application built in 24 hours as part of a coding challenge
 
 </div>
 
