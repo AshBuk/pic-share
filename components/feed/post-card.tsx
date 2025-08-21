@@ -24,11 +24,10 @@ interface PostCardProps {
 // Memoized image component - SHOULD NOT re-render when likes change
 const PostImage = memo(
   ({ imageUrl, title, postId, priority }: { imageUrl: string; title: string; postId: string; priority: boolean }) => {
-    console.log('PostImage render for:', postId)
     return (
       <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700">
         {imageUrl ? (
-          <Link href={`/post/${postId}`} aria-label="Open post">
+          <Link href={`/post/${postId}`} aria-label="Open post" className="relative block h-full w-full">
             <Image
               src={imageUrl}
               alt={title}
@@ -69,8 +68,6 @@ const PostImage = memo(
 PostImage.displayName = 'PostImage'
 
 function PostCardComponent({ post, priority = false }: PostCardProps) {
-  console.log('PostCard render for post:', post.id, 'likes:', post.likes_count, 'user_has_liked:', post.user_has_liked)
-
   const { user } = useAuth()
   const { deletePost } = usePostActions()
   const [currentPost, setCurrentPost] = useState(post)
@@ -156,26 +153,12 @@ function PostCardComponent({ post, priority = false }: PostCardProps) {
 
 // Memoize PostCard, updates only when key data changes
 export const PostCard = memo(PostCardComponent, (prevProps, nextProps) => {
-  // Check each field separately for debugging
   const idSame = prevProps.post.id === nextProps.post.id
   const likesSame = prevProps.post.likes_count === nextProps.post.likes_count
   const userLikedSame = prevProps.post.user_has_liked === nextProps.post.user_has_liked
   const commentsSame = prevProps.post.comments?.length === nextProps.post.comments?.length
+  const commentsRefSame = prevProps.post.comments === nextProps.post.comments
   const prioritySame = prevProps.priority === nextProps.priority
 
-  const shouldSkipUpdate = idSame && likesSame && userLikedSame && commentsSame && prioritySame
-
-  if (!shouldSkipUpdate) {
-    console.log('PostCard WILL re-render for post:', nextProps.post.id, {
-      idSame,
-      likesSame: `${prevProps.post.likes_count} -> ${nextProps.post.likes_count} (${likesSame})`,
-      userLikedSame: `${prevProps.post.user_has_liked} -> ${nextProps.post.user_has_liked} (${userLikedSame})`,
-      commentsSame: `${prevProps.post.comments?.length} -> ${nextProps.post.comments?.length} (${commentsSame})`,
-      prioritySame,
-    })
-  } else {
-    console.log('PostCard SKIP re-render for post:', nextProps.post.id)
-  }
-
-  return shouldSkipUpdate
+  return idSame && likesSame && userLikedSame && commentsSame && commentsRefSame && prioritySame
 })

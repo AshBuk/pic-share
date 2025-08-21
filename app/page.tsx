@@ -11,7 +11,7 @@ import { forceRefreshFeed } from '@/hooks/use-posts'
 import { PostsFeed } from '@/components/feed/posts-feed'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 function Dashboard() {
@@ -35,14 +35,14 @@ function Dashboard() {
     </Button>
   )
 
-  const fetchPostsCount = async () => {
-    if (!user) return
+  const fetchPostsCount = useCallback(async () => {
+    if (!user?.id) return
     const { count, error } = await supabase
       .from('posts')
       .select('id', { count: 'exact', head: true })
       .eq('user_id', user.id)
     if (!error && typeof count === 'number') setPostsCount(count)
-  }
+  }, [supabase, user?.id])
 
   useEffect(() => {
     fetchPostsCount()
@@ -56,7 +56,7 @@ function Dashboard() {
     return () => {
       channelRef.current?.unsubscribe()
     }
-  }, [user?.id])
+  }, [user?.id, supabase, fetchPostsCount])
 
   const handleUploadSuccess = () => {
     fetchPostsCount()

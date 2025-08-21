@@ -1,11 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    optimizePackageImports: ['geist'],
+  eslint: {
+    ignoreDuringBuilds: false,
   },
-  // Disable font optimization to prevent preload warnings
-  optimizeFonts: false,
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   images: {
+    unoptimized: false,
     remotePatterns: [
       {
         protocol: 'https',

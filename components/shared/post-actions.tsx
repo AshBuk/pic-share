@@ -35,7 +35,8 @@ export function PostActions({
     if (!user) return
 
     // Optimistic update
-    const newLikedState = !optimisticPost.user_has_liked
+    const prevLikedState = optimisticPost.user_has_liked
+    const newLikedState = !prevLikedState
     const newLikesCount = newLikedState
       ? (optimisticPost.likes_count || 0) + 1
       : Math.max((optimisticPost.likes_count || 0) - 1, 0)
@@ -50,7 +51,7 @@ export function PostActions({
     setOptimisticPost(optimisticUpdate)
     onPostUpdate?.(optimisticUpdate)
 
-    const result = await toggleLike(post.id, post.user_has_liked)
+    const result = await toggleLike(post.id, prevLikedState)
 
     // If error, rollback
     if (result?.error) {

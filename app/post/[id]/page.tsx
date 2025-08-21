@@ -147,26 +147,77 @@ export default function PostDetailPage() {
       setLoading(false)
     }
     if (postId) fetchPost()
-  }, [postId, user])
+  }, [postId, user, supabase])
 
   // Removed real-time subscriptions - using unified PostActions component
 
   // Refresh post data when window gains focus
   useEffect(() => {
     const handleFocus = () => {
-      console.log('Post detail: window focused, refreshing post data')
-      refetchPost()
+      // inline re-fetch to keep stable deps and avoid re-creating function
+      if (!postId) return
+      supabase
+        .from('posts')
+        .select(
+          `
+        *,
+        profiles:user_id (
+          id,
+          username,
+          full_name,
+          avatar_url,
+          created_at
+        ),
+        likes (
+          id,
+          user_id,
+          post_id,
+          created_at
+        ),
+        comments (
+          id,
+          user_id,
+          post_id,
+          content,
+          created_at,
+          profiles:user_id (
+            id,
+            username,
+            full_name,
+            avatar_url,
+            created_at
+          )
+        )
+      `
+        )
+        .eq('id', postId)
+        .single()
+        .then(({ data, error }) => {
+          if (!error && data) {
+            const normalizedComments = ((data.comments || []) as any[])
+              .slice()
+              .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+              .map((c: any) => ({
+                ...c,
+                profiles: Array.isArray(c.profiles) ? c.profiles[0] : c.profiles,
+              }))
+            const sorted = { ...data, comments: normalizedComments }
+            setPost({
+              ...sorted,
+              user_has_liked: user ? sorted.likes?.some((l: any) => l.user_id === user.id) : false,
+            } as PostWithProfile)
+          }
+        })
     }
 
     window.addEventListener('focus', handleFocus)
     return () => window.removeEventListener('focus', handleFocus)
-  }, [postId, user])
+  }, [postId, user, supabase])
 
   // Force refresh feed when navigating away from post page
   useEffect(() => {
     return () => {
       // Cleanup: force refresh feed when leaving post page
-      console.log('Post detail: cleaning up, force refreshing feed')
       forceRefreshFeed()
     }
   }, [])

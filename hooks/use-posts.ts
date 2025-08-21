@@ -18,21 +18,18 @@ let globalForceRefresh: (() => void) | null = null
 
 export function refreshFeedLikes() {
   if (globalApplyLikesUpdate) {
-    console.log('External: refreshing feed likes')
     globalApplyLikesUpdate()
   }
 }
 
 export function refreshFeedComments() {
   if (globalApplyCommentsUpdate) {
-    console.log('External: refreshing feed comments')
     globalApplyCommentsUpdate()
   }
 }
 
 export function forceRefreshFeed() {
   if (globalForceRefresh) {
-    console.log('External: force refreshing entire feed')
     globalForceRefresh()
   }
 }
@@ -136,17 +133,14 @@ export function usePosts() {
   // Update only likes without touching images/comments
   const applyLikesUpdate = useCallback(async () => {
     try {
-      console.log('Feed: applying likes-only update...')
       const { data } = await supabase
         .from('posts')
         .select(`id, likes ( id, user_id ), likes_count`)
         .order('created_at', { ascending: false })
 
       if (!data) {
-        console.log('Feed: no likes data returned')
         return
       }
-      console.log('Feed: received likes data for posts:', data.length)
       const byId: Record<string, any> = Object.fromEntries(data.map((p: any) => [p.id, p]))
       setPosts((prev) => {
         let hasChanges = false
@@ -161,22 +155,8 @@ export function usePosts() {
 
           // IMPORTANT: return the original object if nothing changed
           if (p.likes_count === newLikesCount && p.user_has_liked === newUserHasLiked) {
-            console.log('Feed: no changes for post', p.id, '- returning same object')
             return p // Return the SAME object - memoization will work!
           }
-
-          console.log(
-            'Feed: updating post',
-            p.id,
-            'likes:',
-            p.likes_count,
-            '->',
-            newLikesCount,
-            'user_liked:',
-            p.user_has_liked,
-            '->',
-            newUserHasLiked
-          )
           hasChanges = true
 
           // Create a new object only if something changed
@@ -190,12 +170,10 @@ export function usePosts() {
 
         // If nothing changed, return the same array
         if (!hasChanges) {
-          console.log('Feed: no changes in any post - keeping same array reference')
           return prev
         }
 
         postsCache = updatedPosts
-        console.log('Feed: updated likes cache, posts count:', updatedPosts.length)
         return updatedPosts
       })
     } catch {}
@@ -204,7 +182,6 @@ export function usePosts() {
   // Lightweight in-place updates for comments without refetching images
   const applyCommentsUpdate = useCallback(async () => {
     try {
-      console.log('Feed: applying comments update...')
       const { data } = await supabase
         .from('posts')
         .select(
@@ -216,10 +193,8 @@ export function usePosts() {
         .order('created_at', { ascending: false })
 
       if (!data) {
-        console.log('Feed: no comments data returned')
         return
       }
-      console.log('Feed: received comments data for posts:', data.length)
       const byId: Record<string, any> = Object.fromEntries(data.map((p: any) => [p.id, p]))
       setPosts((prev) => {
         const updatedPosts = prev.map((p) => {
@@ -274,7 +249,6 @@ export function usePosts() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (!document.hidden && user) {
-        console.log('Feed: tab became visible, force refreshing all data')
         // Force refresh everything when returning to feed
         setTimeout(() => {
           applyLikesUpdate()
@@ -285,7 +259,6 @@ export function usePosts() {
 
     const handleFocus = () => {
       if (user) {
-        console.log('Feed: window focused, force refreshing all data')
         setTimeout(() => {
           applyLikesUpdate()
           applyCommentsUpdate()
@@ -352,7 +325,6 @@ export function usePosts() {
   // Sync on browser back/forward navigation
   useEffect(() => {
     const onPopState = () => {
-      console.log('Feed: popstate detected, syncing likes/comments')
       setTimeout(() => {
         applyLikesUpdate()
         applyCommentsUpdate()
