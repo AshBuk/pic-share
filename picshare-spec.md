@@ -11,13 +11,14 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 - Tailwind CSS for styling
 - shadcn/ui components
 - Supabase client v2 for database and auth
-- React Query for data fetching
 - React Hook Form + Zod for forms
 - Lucide React for icons
+- react-hot-toast for notifications
+- next-themes for theme management
 
-**Code Generation Rules:**
+**Code Rules:**
 
-- Always include proper TypeScript types and interfaces
+- Include proper TypeScript types and interfaces
 - Error handling with try/catch blocks
 - Loading states and skeleton components
 - Responsive design (mobile-first approach)
@@ -30,26 +31,21 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 
 **App Router Pages:**
 
-- `/` - Home feed with photo grid
-- `/auth/signin` - User sign in page
-- `/auth/signup` - User registration page
-- `/profile` - User profile with personal posts grid
-- `/upload` - Image upload form with preview
+- `/` - Home feed with photo grid (includes integrated auth forms)
+- `/profile` - User profile with personal posts grid  
 - `/post/[id]` - Single post view with comments
+
+**Note:** Authentication is integrated into the main page layout via auth components rather than separate auth pages. Image upload is handled via dialog components rather than a dedicated upload page.
 
 ## Layout & Navigation
 
 **Header Navigation:**
 
 - Left: "PicShare" logo with camera icon (Lucide React)
-- Center: Navigation links
-  - "Home" (always visible)
-  - "Upload" (authenticated users only)
 - Right: User menu
   - Authenticated: Profile avatar, Profile link, Sign Out
   - Non-authenticated: Sign In button
 - Theme toggle (light/dark mode)
-- Mobile: Hamburger menu for small screens
 
 **Responsive Design:**
 
@@ -96,13 +92,6 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 - User profile pages showing personal posts
 
 ## Database Integration (Supabase)
-
-**Environment Variables:**
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=https://vbmjwyzimcezocxxbqxm.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZibWp3eXppbWNlem9jeHhicXhtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2MTI3NjgsImV4cCI6MjA3MTE4ODc2OH0.LjmXtJU6gN033_uTzSlXinZMNN7VbnOUu0MDtd5ADcQ
-```
 
 **Database Schema (Already Created):**
 
@@ -158,49 +147,43 @@ interface Comment {
 components/
 ├── ui/              # shadcn/ui components
 ├── auth/
-│   ├── AuthProvider.tsx     # Context for authentication
-│   ├── SignInForm.tsx       # Login form with validation
-│   ├── SignUpForm.tsx       # Registration form
-│   └── ProtectedRoute.tsx   # Route protection wrapper
-├── posts/
-│   ├── PostCard.tsx         # Individual post display
-│   ├── PostGrid.tsx         # Grid layout for posts
-│   ├── PostUpload.tsx       # Upload form with preview
-│   ├── PostComments.tsx     # Comments section
-│   └── LikeButton.tsx       # Like/unlike functionality
-├── layout/
-│   ├── Header.tsx           # Main navigation
-│   ├── MobileMenu.tsx       # Mobile hamburger menu
-│   └── ThemeToggle.tsx      # Dark/light mode toggle
-└── common/
-    ├── LoadingSkeleton.tsx  # Loading placeholders
-    └── ErrorBoundary.tsx    # Error handling
+│   ├── auth-form.tsx        # Combined login/signup form
+│   └── protected-route.tsx  # Route protection wrapper
+├── feed/
+│   ├── post-card.tsx        # Individual post display
+│   ├── posts-feed.tsx       # Feed layout for posts
+│   └── comments-section.tsx # Comments section
+├── upload/
+│   └── image-upload-dialog.tsx # Upload form with preview in dialog
+├── profile/
+│   ├── user-profile.tsx     # User profile display
+│   └── edit-profile-dialog.tsx # Profile editing in dialog
+├── shared/
+│   └── post-actions.tsx     # Like/unlike and other post actions
+└── theme-provider.tsx       # Theme management provider
 ```
 
 ### Required Hooks:
 
 ```typescript
-// Custom hooks for data fetching
+// Custom hooks for functionality
 const useAuth = () => {
-  /* Supabase auth state */
+  /* Supabase auth state management */
 }
 const usePosts = () => {
-  /* Fetch all posts with React Query */
+  /* Fetch all posts */
 }
 const useUserPosts = (userId: string) => {
   /* User-specific posts */
 }
-const usePost = (postId: string) => {
-  /* Single post with comments */
+const usePostActions = () => {
+  /* Like/unlike and delete post actions */
 }
-const useUploadImage = () => {
+const useImageUpload = () => {
   /* Image upload to storage */
 }
-const useLikePost = () => {
-  /* Like/unlike mutation */
-}
-const useComments = (postId: string) => {
-  /* Post comments */
+const useAvatarUpload = () => {
+  /* Avatar upload functionality */
 }
 ```
 
@@ -209,13 +192,10 @@ const useComments = (postId: string) => {
 ### Supabase Client Setup:
 
 ```typescript
-// lib/supabaseClient.ts
-import { createClient } from '@supabase/supabase-js'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// lib/supabase/client.ts - Browser client
+// lib/supabase/server.ts - Server client  
+// lib/supabase/middleware.ts - Middleware client
+// lib/supabase/types.ts - TypeScript types
 ```
 
 ### Form Validation:
@@ -231,7 +211,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 - Implement image lazy loading
 - Add blur placeholders for images
 - Optimize Supabase queries with proper indexes
-- Use React Query for caching and real-time updates
+- Custom hooks for state management and caching
 
 ### Real-time Features:
 
@@ -302,15 +282,3 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey)
 - Proper CORS configuration
 - Environment variable security
 - Image upload size limits
-
-## Deployment Requirements
-
-**Production Checklist:**
-
-- All environment variables configured
-- Supabase RLS policies active
-- Image optimization enabled
-- Error tracking implemented
-- Performance monitoring
-
-Generate a complete, production-ready photo sharing application that follows all these specifications and creates an Instagram-like user experience with modern web development best practices.
