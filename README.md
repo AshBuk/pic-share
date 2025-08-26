@@ -81,7 +81,7 @@ For development setup, deployment instructions, and technical details, see [DEVE
 
 ## 📜 License
 
-MIT License - feel free to use this project as a learning resource or starting point for your own applications.
+MIT License.
 
 ## ⭐ Support
 
