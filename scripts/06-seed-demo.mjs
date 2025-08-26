@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2025 Asher Buk
+ * SPDX-License-Identifier: MIT
+ */
+
 // Seed demo users, posts, likes, and comments using Supabase Admin API
 // Requirements:
 // - Environment variables:

@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2025 Asher Buk
+ * SPDX-License-Identifier: MIT
+ */
+
 import type { Config } from 'tailwindcss'
 
 // all in fixtures is set to tailwind v3 as interims solutions

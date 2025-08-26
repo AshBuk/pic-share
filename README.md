@@ -75,75 +75,9 @@ This project was built as part of a coding challenge to demonstrate full-stack d
 - **Performance optimized** - Memoized components, lazy loading
 - **Real-time architecture** - Supabase subscriptions for live updates
 
-## Local development
+## For Developers
 
-1. Prerequisites
-
-- Node.js 18.18+ and npm 9+
-- A Supabase project (URL + anon key)
-
-2. Environment variables
-
-Create a `.env.local` in the project root:
-
-```
-NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
-# Optional: used for auth email confirmation redirect in dev
-NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL=http://localhost:3000
-```
-
-Also add both `http://localhost:3000` and your production domain to Supabase Auth → URL Configuration (redirects and allowed origins).
-
-3. Database setup (run in Supabase SQL editor)
-
-Run these scripts in order:
-
-- `scripts/01-create-tables.sql`
-- `scripts/02-create-storage-bucket.sql`
-- `scripts/03-create-functions.sql`
-- `scripts/05-enable-realtime.sql`
-
-4. Start the app
-
-```
-npm install
-npm run dev
-```
-
-The app will be available on `http://localhost:3000`.
-
-### Seed demo content (optional)
-
-Populate real demo users, posts with real images, likes and comments:
-
-1. Ensure env variables:
-   - `SUPABASE_URL` (or reuse `NEXT_PUBLIC_SUPABASE_URL`)
-   - `SUPABASE_SERVICE_ROLE_KEY`
-2. Run:
-
-```
-node scripts/06-seed-demo.mjs
-```
-
-This will create users like David Cohen, Rivka Levi, etc., upload images to the `images` bucket, and generate likes/comments. All data uses real Supabase tables so you can like and comment interactively.
-
-## Deploy to Vercel
-
-1. Push this repo to GitHub and import it in Vercel
-2. Set Environment Variables in Vercel Project Settings:
-
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-Optionally set `NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL` to your production URL. Make sure the same URL is whitelisted in Supabase Auth.
-
-3. Deploy. No extra build settings are required. Images are served unoptimized by Next.js per `next.config.mjs`.
-
-## Post-deploy checklist
-
-- In Supabase Storage, ensure bucket `images` exists and is public (script `02-...` does this)
-- In Supabase Realtime, ensure `posts`, `likes`, and `comments` are in the `supabase_realtime` publication (script `05-...`)
+For development setup, deployment instructions, and technical details, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 
 ## 📜 License
 
@@ -154,4 +88,6 @@ MIT License - feel free to use this project as a learning resource or starting p
 If this project helped you learn something new, please consider:
 
 - ⭐ **Starring this repository**
-- 💖 **Sponsoring** my open source works: [GitHub Sponsors](https://github.com/sponsors/AshBuk)
+- 💖 **Sponsoring** my open source works:
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-💖-pink?style=for-the-badge&logo=github)](https://github.com/sponsors/AshBuk) [![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://www.paypal.com/donate/?hosted_button_id=R3HZH8DX7SCJG)

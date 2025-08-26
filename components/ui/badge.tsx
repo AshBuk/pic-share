@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2025 Asher Buk
+ * SPDX-License-Identifier: MIT
+ */
+
 import * as React from 'react'
 import { cva, type VariantProps } from 'class-variance-authority'
 

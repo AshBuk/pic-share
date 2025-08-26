@@ -1,0 +1,16 @@
+# Global code owner
+* @AshBuk
+
+# Specific areas
+/app/ @AshBuk
+/components/ @AshBuk
+/hooks/ @AshBuk
+/lib/ @AshBuk
+/scripts/ @AshBuk
+/styles/ @AshBuk
+
+# Configuration files
+*.json @AshBuk
+*.js @AshBuk
+*.ts @AshBuk
+*.config.* @AshBuk
