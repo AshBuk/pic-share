@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2025 Asher Buk
+ * SPDX-License-Identifier: MIT
+ */
+
 import { updateSession } from './lib/supabase/middleware'
 
 export async function middleware(request: any) {

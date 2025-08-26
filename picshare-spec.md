@@ -32,7 +32,7 @@ Create a modern photo sharing app called "PicShare" (mini Instagram clone) using
 **App Router Pages:**
 
 - `/` - Home feed with photo grid (includes integrated auth forms)
-- `/profile` - User profile with personal posts grid  
+- `/profile` - User profile with personal posts grid
 - `/post/[id]` - Single post view with comments
 
 **Note:** Authentication is integrated into the main page layout via auth components rather than separate auth pages. Image upload is handled via dialog components rather than a dedicated upload page.
@@ -193,7 +193,7 @@ const useAvatarUpload = () => {
 
 ```typescript
 // lib/supabase/client.ts - Browser client
-// lib/supabase/server.ts - Server client  
+// lib/supabase/server.ts - Server client
 // lib/supabase/middleware.ts - Middleware client
 // lib/supabase/types.ts - TypeScript types
 ```

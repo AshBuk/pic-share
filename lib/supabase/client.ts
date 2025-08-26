@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2025 Asher Buk
+ * SPDX-License-Identifier: MIT
+ */
+
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import type { Database } from './types'
 

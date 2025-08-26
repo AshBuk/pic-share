@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2025 Asher Buk
+ * SPDX-License-Identifier: MIT
+ */
+
 -- Create storage bucket for images
 INSERT INTO storage.buckets (id, name, public) 
 VALUES ('images', 'images', true)
