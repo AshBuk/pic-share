@@ -1,6 +1,6 @@
 <div align="center">
 
-# 📸 PicShare
+<img width="550" height="635" alt="pics-share" src="https://github.com/user-attachments/assets/3841d59a-4b92-4db0-a536-2fd3409d48dd" />
 
 > \*\*A Demo Project – Instagram-like photo sharing application built in 24 hours as part of a coding challenge
 
@@ -13,9 +13,9 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-black?style=for-the-badge)](https://ui.shadcn.com/)
 
-## About This Project
+## About
 
-This project was built as part of a coding challenge to demonstrate full-stack development skills. The task was to create a **modern Instagram-like photo sharing application** with full functionality in a limited timeframe.
+**📸 PicShare project was built as part of a coding challenge to demonstrate full-stack development skills. The task was to create a **modern Instagram-like photo sharing application** with full functionality in a limited timeframe.**
 
 ## Live Demo
 
