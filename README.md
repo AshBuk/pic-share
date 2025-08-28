@@ -2,7 +2,7 @@
 
 <img width="550" height="635" alt="pics-share" src="https://github.com/user-attachments/assets/3841d59a-4b92-4db0-a536-2fd3409d48dd" />
 
-> \*\*A Demo Project – Instagram-like photo sharing application built in 24 hours as part of a coding challenge
+> A Demo Project – Instagram-like photo sharing application built in 24 hours as part of a coding challenge
 
 </div>
 
