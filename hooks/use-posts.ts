@@ -243,17 +243,18 @@ export function usePosts() {
     }
   }
 
+  // Initial fetch should run for both guests and authenticated users
   useEffect(() => {
-    if (!fetchedRef.current && user) {
+    if (!fetchedRef.current) {
       fetchedRef.current = true
       fetchInitial()
     }
-  }, [user])
+  }, [])
 
   // Update data when returning to tab/page
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (!document.hidden && user) {
+      if (!document.hidden) {
         // Force refresh everything when returning to feed
         setTimeout(() => {
           applyLikesUpdate()
@@ -263,12 +264,10 @@ export function usePosts() {
     }
 
     const handleFocus = () => {
-      if (user) {
-        setTimeout(() => {
-          applyLikesUpdate()
-          applyCommentsUpdate()
-        }, 100)
-      }
+      setTimeout(() => {
+        applyLikesUpdate()
+        applyCommentsUpdate()
+      }, 100)
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
@@ -277,7 +276,7 @@ export function usePosts() {
       document.removeEventListener('visibilitychange', handleVisibilityChange)
       window.removeEventListener('focus', handleFocus)
     }
-  }, [user, applyLikesUpdate])
+  }, [applyLikesUpdate])
 
   // Bind global functions to local ones
   useEffect(() => {
