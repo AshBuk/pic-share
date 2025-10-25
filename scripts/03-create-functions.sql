@@ -16,7 +16,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 
 -- Trigger for new user registration
 DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
@@ -37,7 +37,7 @@ BEGIN
   END IF;
   RETURN NULL;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql SET search_path = public, pg_temp;
 
 -- Triggers for likes count
 DROP TRIGGER IF EXISTS likes_count_trigger_insert ON likes;
