@@ -12,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Camera, RefreshCw } from 'lucide-react'
 import { ImageUploadDialog } from '@/components/upload/image-upload-dialog'
+import { useAuth } from '@/hooks/use-auth'
 
 interface PostsFeedProps {
   onUploadSuccess?: () => void
@@ -23,6 +24,7 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
   const [hasAutoLoaded, setHasAutoLoaded] = useState(false)
   const [renderedPosts, setRenderedPosts] = useState<JSX.Element[]>([])
   const previousPostsRef = useRef<any[]>([])
+  const { user } = useAuth()
 
   // Memoize posts individually
   useEffect(() => {
@@ -139,12 +141,14 @@ export function PostsFeed({ onUploadSuccess }: PostsFeedProps) {
             <p className="text-gray-600 dark:text-gray-300 mb-4">
               No posts yet. Be the first to share your amazing photos with the world!
             </p>
-            <ImageUploadDialog onUploadSuccess={handleUploadSuccess}>
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Camera className="h-4 w-4 mr-2" />
-                Upload Your First Photo
-              </Button>
-            </ImageUploadDialog>
+            {user && (
+              <ImageUploadDialog onUploadSuccess={handleUploadSuccess}>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  <Camera className="h-4 w-4 mr-2" />
+                  Upload Your First Photo
+                </Button>
+              </ImageUploadDialog>
+            )}
           </div>
         </CardContent>
       </Card>
