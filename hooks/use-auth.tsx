@@ -14,7 +14,13 @@ interface AuthContextType {
   user: User | null
   profile: Profile | null
   loading: boolean
-  signUp: (email: string, password: string, username: string, fullName?: string) => Promise<{ error: any }>
+  signUp: (
+    email: string,
+    password: string,
+    username: string,
+    fullName?: string,
+    captchaToken?: string
+  ) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>
@@ -102,7 +108,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const signUp = async (email: string, password: string, username: string, fullName?: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    username: string,
+    fullName?: string,
+    captchaToken?: string
+  ) => {
     try {
       const { error } = await supabase.auth.signUp({
         email,
@@ -113,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             full_name: fullName || '',
           },
           emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || window.location.origin,
+          captchaToken,
         },
       })
       return { error }
