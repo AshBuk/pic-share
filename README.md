@@ -27,6 +27,8 @@
 
 **🔗 [View Live Application](https://pics-share.vercel.app)**
 
+*Demo version on Vercel with authentication disabled — guest mode only.*
+
 ### Development Story
 
 **Timeline:** Built in ~24 hours  
