@@ -157,14 +157,9 @@ async function ensureProfileForUser(userId, meta) {
   const { data: existing } = await supabase.from('profiles').select('id').eq('id', userId).single()
   if (existing) {
     // Update only missing fields
-    await supabase
-      .from('profiles')
-      .update({ username, full_name: fullName })
-      .eq('id', userId)
+    await supabase.from('profiles').update({ username, full_name: fullName }).eq('id', userId)
   } else {
-    await supabase
-      .from('profiles')
-      .insert({ id: userId, username, full_name: fullName, avatar_url: '' })
+    await supabase.from('profiles').insert({ id: userId, username, full_name: fullName, avatar_url: '' })
   }
 }
 

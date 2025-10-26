@@ -104,11 +104,14 @@ CREATE INDEX IF NOT EXISTS idx_comments_user_created_at ON comments(user_id, cre
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 GRANT SELECT ON TABLE profiles, posts, likes, comments TO anon;
 GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE profiles, posts, likes, comments TO authenticated;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE profiles, posts, likes, comments TO service_role;
 
 -- Default privileges for future tables created by postgres
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
   GRANT SELECT ON TABLES TO anon;
 ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
   GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO authenticated;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO service_role;
 
 
