@@ -17,18 +17,32 @@ WITH CHECK (
 
 -- 2) Rate limiting helpers
 CREATE OR REPLACE FUNCTION public.can_create_post(uid uuid)
-RETURNS boolean LANGUAGE sql STABLE AS $$
-  SELECT COUNT(*) FILTER (WHERE created_at > now() - interval '1 day') < 3
-  FROM posts WHERE user_id = uid
+RETURNS boolean
+LANGUAGE plpgsql STABLE
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RETURN (
+    SELECT COUNT(*) FILTER (WHERE created_at > now() - interval '1 day') < 3
+    FROM posts WHERE user_id = uid
+  );
+END;
 $$;
 
 CREATE OR REPLACE FUNCTION public.can_create_comment(uid uuid)
-RETURNS boolean LANGUAGE sql STABLE AS $$
-  SELECT
-    (COUNT(*) FILTER (WHERE created_at > now() - interval '1 minute') < 3)
-    AND
-    (COUNT(*) FILTER (WHERE created_at > now() - interval '1 day') < 10)
-  FROM comments WHERE user_id = uid
+RETURNS boolean
+LANGUAGE plpgsql STABLE
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  RETURN (
+    SELECT
+      (COUNT(*) FILTER (WHERE created_at > now() - interval '1 minute') < 3)
+      AND
+      (COUNT(*) FILTER (WHERE created_at > now() - interval '1 day') < 10)
+    FROM comments WHERE user_id = uid
+  );
+END;
 $$;
 
 -- Strengthen INSERT policies for posts/comments
