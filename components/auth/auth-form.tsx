@@ -31,6 +31,7 @@ const signUpSchema = z.object({
     .min(3, 'Username must be at least 3 characters')
     .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
   fullName: z.string().optional(),
+  captchaToken: z.string().optional(),
 })
 
 type SignInForm = z.infer<typeof signInSchema>
@@ -78,7 +79,13 @@ export function AuthForm() {
     setError(null)
     setSuccess(null)
 
-    const { error } = await signUp(data.email, data.password, data.username, data.fullName)
+    const { error } = await signUp(
+      data.email,
+      data.password,
+      data.username,
+      data.fullName,
+      process.env.NEXT_PUBLIC_ENABLE_CAPTCHA === 'true' ? data.captchaToken : undefined
+    )
 
     if (error) {
       setError(error.message)
@@ -99,6 +106,19 @@ export function AuthForm() {
               <Camera className="h-8 w-8 text-blue-600" />
               <Heart className="h-4 w-4 text-red-500 absolute -top-1 -right-1" />
             </div>
+
+            {process.env.NEXT_PUBLIC_ENABLE_CAPTCHA === 'true' && (
+              <div className="space-y-2">
+                <Label htmlFor="signup-captcha">Captcha Token</Label>
+                <Input
+                  id="signup-captcha"
+                  type="text"
+                  placeholder="Enter captcha token"
+                  {...signUpForm.register('captchaToken')}
+                  className="bg-white/50 dark:bg-gray-700/50 dark:text-white"
+                />
+              </div>
+            )}
             <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               PicShare
             </h1>

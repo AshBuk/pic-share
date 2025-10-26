@@ -27,6 +27,7 @@ Run these scripts in order in the Supabase SQL editor:
 - `scripts/01-create-tables.sql`
 - `scripts/02-create-storage-bucket.sql`
 - `scripts/03-create-functions.sql`
+- `scripts/04-security-hardening.sql`
 - `scripts/05-enable-realtime.sql`
 
 ### Start the Application

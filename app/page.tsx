@@ -5,7 +5,6 @@
 
 'use client'
 
-import { ProtectedRoute } from '@/components/auth/protected-route'
 import { useAuth } from '@/hooks/use-auth'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -26,19 +25,27 @@ function Dashboard() {
   const supabase = createClient()
   const [postsCount, setPostsCount] = useState(0)
   const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null)
+  const [mounted, setMounted] = useState(false)
 
   const currentTheme = theme === 'system' ? systemTheme : theme
 
-  const ThemeToggle = () => (
-    <Button
-      variant="outline"
-      size="sm"
-      onClick={() => setTheme(currentTheme === 'dark' ? 'light' : 'dark')}
-      aria-label="Toggle theme"
-    >
-      {currentTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </Button>
-  )
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const ThemeToggle = () => {
+    if (!mounted) return null
+    return (
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => setTheme(currentTheme === 'dark' ? 'light' : 'dark')}
+        aria-label="Toggle theme"
+      >
+        {currentTheme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+      </Button>
+    )
+  }
 
   const fetchPostsCount = useCallback(async () => {
     if (!user?.id) return
@@ -85,26 +92,35 @@ function Dashboard() {
 
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-
-            {/* Admin link removed */}
-
-            <Link href="/profile">
-              <div className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
-                <Avatar className="h-8 w-8">
-                  <AvatarImage src={profile?.avatar_url || ''} />
-                  <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                    {profile?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                  {profile?.username || user?.email}
-                </span>
-              </div>
-            </Link>
-
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="h-4 w-4" />
-            </Button>
+            {user ? (
+              <>
+                <Link href="/profile">
+                  <div className="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition-opacity">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={profile?.avatar_url || ''} />
+                      <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                        {profile?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                      {profile?.username || user?.email}
+                    </span>
+                  </div>
+                </Link>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </>
+            ) : (
+              <Link href="/profile">
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                >
+                  Sign up / Sign in
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -119,58 +135,61 @@ function Dashboard() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Profile Card */}
-            <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
-              <CardHeader className="text-center">
-                <CardTitle>{profile?.full_name || 'Your Profile'}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Link href="/profile">
-                  <div className="flex flex-col items-center space-y-3 cursor-pointer hover:opacity-80 transition-opacity">
-                    <Avatar className="h-14 w-14">
-                      <AvatarImage src={profile?.avatar_url || ''} />
-                      <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                        {profile?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="text-center">
-                      <p className="font-semibold text-lg">{profile?.full_name || profile?.username}</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">@{profile?.username}</p>
+            {/* Profile Card (hidden for guests) */}
+            {user && (
+              <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
+                <CardHeader className="text-center">
+                  <CardTitle>{profile?.full_name || 'Your Profile'}</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Link href="/profile">
+                    <div className="flex flex-col items-center space-y-3 cursor-pointer hover:opacity-80 transition-opacity">
+                      <Avatar className="h-14 w-14">
+                        <AvatarImage src={profile?.avatar_url || ''} />
+                        <AvatarFallback className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                          {profile?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="text-center">
+                        <p className="font-semibold text-lg">{profile?.full_name || profile?.username}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">@{profile?.username}</p>
+                      </div>
+                    </div>
+                  </Link>
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <p className="font-semibold">{postsCount}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Posts</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold">0</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Followers</p>
+                    </div>
+                    <div>
+                      <p className="font-semibold">0</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Following</p>
                     </div>
                   </div>
-                </Link>
-                <div className="grid grid-cols-3 gap-4 text-center">
-                  <div>
-                    <p className="font-semibold">{postsCount}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Posts</p>
-                  </div>
-                  <div>
-                    <p className="font-semibold">0</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Followers</p>
-                  </div>
-                  <div>
-                    <p className="font-semibold">0</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Following</p>
-                  </div>
-                </div>
-                {/* View Profile button removed for cleaner look */}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
 
-            {/* Quick Upload */}
-            <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
-              <CardHeader className="text-center">
-                <CardTitle>Share Something</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center">
-                <ImageUploadDialog onUploadSuccess={handleUploadSuccess}>
-                  <Button className="mx-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Upload Photo
-                  </Button>
-                </ImageUploadDialog>
-              </CardContent>
-            </Card>
+            {/* Quick Upload (hidden for guests) */}
+            {user && (
+              <Card className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 border-0 shadow-lg">
+                <CardHeader className="text-center">
+                  <CardTitle>Share Something</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <ImageUploadDialog onUploadSuccess={handleUploadSuccess}>
+                    <Button className="mx-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Upload Photo
+                    </Button>
+                  </ImageUploadDialog>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Admin panel removed */}
 
@@ -193,9 +212,5 @@ function Dashboard() {
 }
 
 export default function HomePage() {
-  return (
-    <ProtectedRoute>
-      <Dashboard />
-    </ProtectedRoute>
-  )
+  return <Dashboard />
 }

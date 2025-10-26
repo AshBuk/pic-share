@@ -76,7 +76,7 @@ export function PostActions({
             variant="ghost"
             size="sm"
             onClick={handleLike}
-            disabled={isLoading}
+            disabled={isLoading || !user}
             className={optimisticPost.user_has_liked ? 'text-red-500' : ''}
             aria-label={optimisticPost.user_has_liked ? 'Unlike post' : 'Like post'}
           >

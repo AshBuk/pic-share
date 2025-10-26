@@ -120,22 +120,47 @@ async function createUsers() {
       user_metadata: { username: u.username, full_name: u.fullName },
     })
     if (error) {
-      // If user exists, fetch it
-      const { data: existing, error: e2 } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('username', u.username)
-        .single()
-      if (existing && !e2) {
-        created.push({ id: existing.id, ...u })
-        continue
+      // If user exists, resolve by email via Admin API and ensure profile
+      const existingUser = await findUserByEmail(u.email)
+      if (!existingUser) {
+        console.error('Failed to create user and could not find existing:', u.email, error.message)
+        process.exit(1)
       }
-      console.error('Failed to create user:', u.email, error.message)
-      process.exit(1)
+      await ensureProfileForUser(existingUser.id, u)
+      created.push({ id: existingUser.id, ...u })
+      continue
     }
+    // Ensure profile exists (idempotent in case trigger wasn't set earlier)
+    await ensureProfileForUser(data.user.id, u)
     created.push({ id: data.user.id, ...u })
   }
   return created
+}
+
+async function findUserByEmail(email) {
+  // Paginate through users to find by email (Admin API lacks direct email lookup)
+  let page = 1
+  const perPage = 1000
+  while (true) {
+    const { data, error } = await supabase.auth.admin.listUsers({ page, perPage })
+    if (error) throw error
+    const found = data.users.find((usr) => (usr.email || '').toLowerCase() === email.toLowerCase())
+    if (found) return found
+    if (!data.users || data.users.length < perPage) return null
+    page += 1
+  }
+}
+
+async function ensureProfileForUser(userId, meta) {
+  const username = meta.username
+  const fullName = meta.fullName || ''
+  const { data: existing } = await supabase.from('profiles').select('id').eq('id', userId).single()
+  if (existing) {
+    // Update only missing fields
+    await supabase.from('profiles').update({ username, full_name: fullName }).eq('id', userId)
+  } else {
+    await supabase.from('profiles').insert({ id: userId, username, full_name: fullName, avatar_url: '' })
+  }
 }
 
 // For demo we use direct remote URLs (no storage upload required)

@@ -14,7 +14,13 @@ interface AuthContextType {
   user: User | null
   profile: Profile | null
   loading: boolean
-  signUp: (email: string, password: string, username: string, fullName?: string) => Promise<{ error: any }>
+  signUp: (
+    email: string,
+    password: string,
+    username: string,
+    fullName?: string,
+    captchaToken?: string
+  ) => Promise<{ error: any }>
   signIn: (email: string, password: string) => Promise<{ error: any }>
   signOut: () => Promise<void>
   updateProfile: (updates: Partial<Profile>) => Promise<{ error: any }>
@@ -42,7 +48,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (!error && data) {
         setProfile(data)
+        return
       }
+
+      // Self-heal: if profile is missing (e.g., after schema reset), create it on the fly
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (!user) return
+
+      const emailLocal = (user.email || '').split('@')[0] || 'user'
+      let username = emailLocal.replace(/[^A-Za-z0-9_]/g, '_')
+      if (username.length < 3) username = `user_${user.id.slice(0, 6)}`
+
+      const { data: created } = await supabase
+        .from('profiles')
+        .upsert(
+          {
+            id: user.id,
+            username,
+            full_name: (user.user_metadata as any)?.full_name || '',
+            avatar_url: (user.user_metadata as any)?.avatar_url || '',
+          },
+          { onConflict: 'id' }
+        )
+        .select()
+        .single()
+
+      if (created) setProfile(created)
     } catch (error) {
       console.error('Error fetching profile:', error)
     }
@@ -102,7 +135,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  const signUp = async (email: string, password: string, username: string, fullName?: string) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    username: string,
+    fullName?: string,
+    captchaToken?: string
+  ) => {
     try {
       const { error } = await supabase.auth.signUp({
         email,
@@ -113,6 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             full_name: fullName || '',
           },
           emailRedirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || window.location.origin,
+          captchaToken,
         },
       })
       return { error }
@@ -134,7 +174,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    try {
+      await supabase.auth.signOut()
+    } finally {
+      // Ensure local state clears even if the event is delayed
+      setProfile(null)
+      setUser(null)
+    }
   }
 
   const updateProfile = async (updates: Partial<Profile>) => {
