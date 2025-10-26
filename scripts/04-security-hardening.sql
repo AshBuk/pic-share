@@ -100,4 +100,15 @@ $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public, pg_temp;
 CREATE INDEX IF NOT EXISTS idx_posts_user_created_at ON posts(user_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_comments_user_created_at ON comments(user_id, created_at DESC);
 
+-- 6) Grants: allow public read-only feed; writes guarded by RLS
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT SELECT ON TABLE profiles, posts, likes, comments TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE profiles, posts, likes, comments TO authenticated;
+
+-- Default privileges for future tables created by postgres
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  GRANT SELECT ON TABLES TO anon;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA public
+  GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO authenticated;
+
 
