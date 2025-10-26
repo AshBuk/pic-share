@@ -203,29 +203,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!user) return { error: 'No user logged in' }
     const userId = user.id
     try {
-      // Get user's images for cleanup
-      const { data: posts } = await supabase.from('posts').select('image_url').eq('user_id', userId)
-
-      // Delete profile first - CASCADE will handle all related data
-      const { error: profileError } = await supabase.from('profiles').delete().eq('id', userId)
-
-      if (profileError) throw profileError
-
-      // Clean up images from storage (best effort - don't fail if errors)
-      if (posts && posts.length > 0) {
-        const imagePaths = posts
-          .map((post) => {
-            const fileName = post.image_url.split('/').pop()
-            return `${userId}/${fileName}`
-          })
-          .filter(Boolean)
-
-        if (imagePaths.length > 0) {
-          await supabase.storage.from('images').remove(imagePaths)
-        }
+      // Call server route to delete auth user via service role
+      const res = await fetch('/api/delete-account', { method: 'POST' })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error(body?.error || 'Failed to delete account')
       }
-
-      // Sign out locally
+      // Ensure local sign-out
       await supabase.auth.signOut()
       setProfile(null)
       setUser(null)
