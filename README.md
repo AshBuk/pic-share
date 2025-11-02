@@ -87,9 +87,7 @@
 
 For development setup, deployment instructions, and technical details, see [DEVELOPMENT.md](./DEVELOPMENT.md).
 
-## 📜 License
-
-MIT License.
+## MIT [LICENSE](LICENSE)
 
 ## ⭐ Support
 
