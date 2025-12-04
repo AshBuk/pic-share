@@ -27,7 +27,7 @@
 
 **🔗 [View Live Application](https://pics-share.vercel.app)**
 
-*Demo version on Vercel with authentication disabled — guest mode only.*
+_Demo version on Vercel with authentication disabled — guest mode only._
 
 ### Development Story
 
